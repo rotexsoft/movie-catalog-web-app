@@ -178,12 +178,12 @@ if( s3MVC_GetCurrentAppEnvironment() === S3MVC_APP_ENV_PRODUCTION ) {
     ////////////////////////////////////////////////////////////////////////////
     // Start Vespula.Auth PDO Authentication setup
     ////////////////////////////////////////////////////////////////////////////
-    $container['vespula_auth'] = function () {
+    $container['vespula_auth'] = function ($c) {
         
         $pdo = new \PDO(
-                    'sqlite::memory:', 
-                    null, 
-                    null, 
+                    $c['db_dsn'],
+                    $c['db_uname'], 
+                    $c['db_passwd'], 
                     [
                         PDO::ATTR_PERSISTENT => true, 
                         PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION
@@ -193,15 +193,15 @@ if( s3MVC_GetCurrentAppEnvironment() === S3MVC_APP_ENV_PRODUCTION ) {
         $pass1 = password_hash('admin' , PASSWORD_DEFAULT);
         $pass2 = password_hash('root' , PASSWORD_DEFAULT);
 
-        $sql = <<<SQL
-DROP TABLE IF EXISTS "user_authentication_accounts";
-CREATE TABLE user_authentication_accounts (
-    username VARCHAR(255), password VARCHAR(255)
-);
-INSERT INTO "user_authentication_accounts" VALUES( 'admin', '$pass1' );
-INSERT INTO "user_authentication_accounts" VALUES( 'root', '$pass2' );
-SQL;
-        $pdo->exec($sql); //add two default user accounts
+//        $sql = <<<SQL
+//DROP TABLE IF EXISTS "user_authentication_accounts";
+//CREATE TABLE user_authentication_accounts (
+//    username VARCHAR(255), password VARCHAR(255)
+//);
+//INSERT INTO "user_authentication_accounts" VALUES( 'admin', '$pass1' );
+//INSERT INTO "user_authentication_accounts" VALUES( 'root', '$pass2' );
+//SQL;
+//        $pdo->exec($sql); //add two default user accounts
         
         //Optionally pass a maximum idle time and a time until the session 
         //expires (in seconds)
