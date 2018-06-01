@@ -268,23 +268,18 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
                     $has_field_errors = true;
                 }
             }
-            
-            if( mb_strlen( ''.$posted_data['password'], 'UTF-8') <= 0 ) {
-                
-                $error_msgs['password'][] = 'Password Cannot be blank!';
-                $has_field_errors = true;
-            }
-     
-            //load posted data into new record object
-            $record->loadData($posted_data);
+
+
+            //load posted data into record object
+            $record->username = $posted_data['username'];
 
             if ( !$has_field_errors ) {
                 
-                if( $record->isChanged('password') ) {
+                if( $posted_data['password'] !== '' && !password_verify(''.$posted_data['password'], $record->password) ) {
                   
                     // only hash the password if it's different from the exisitng 
                     // hashed password
-                    $record->password = password_hash($record->password, PASSWORD_DEFAULT);
+                    $record->password = password_hash(''.$posted_data['password'], PASSWORD_DEFAULT);
                 }
                 
                 // try to save

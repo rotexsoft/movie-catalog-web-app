@@ -34,7 +34,7 @@
         
         <div class="small-3 columns">
             <label for="password" class="middle text-right">
-                Password<span style="color: red;"> *</span>
+                Password
             </label>                
         </div>
          
@@ -44,10 +44,9 @@
             <input type="password" 
                    name="password" 
                    id="password" 
-                   maxlength="255" 
-                   required="required"
+                   maxlength="255"
                    <?php echo $input_elems_error_css_class; ?>
-                   value="<?php echo $user_record->password; ?>"
+                   value=""
             >
             <?php printErrorMsg('password', $error_msgs); //print error message(s) if any ?>
         </div>
