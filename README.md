@@ -18,7 +18,7 @@ Now start the application using the built-in PHP server by running the command b
 
 You can then go on to browse to http://localhost:8888 (the application's default home-page)
 
-To initialize the `admin` user browse to `http://localhost:8888/init-users/admin`
+To initialize the `admin` user browse to `http://localhost:8888/init-users/{password}`
 
 * Replace `{password}` with the actual password you would like to assign to the `admin` user
 
