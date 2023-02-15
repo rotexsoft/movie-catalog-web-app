@@ -1,6 +1,6 @@
 {
-    "name": "Name of your web app goes here.",
-    "description": "Description of your web app goes here.",
+    "name": "rotexsoft/movie-web-app",
+    "description": "Simple Movie Catalog Web App built using Slim MVC.",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
