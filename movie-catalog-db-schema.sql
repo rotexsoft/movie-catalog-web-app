@@ -9,8 +9,8 @@ CREATE TABLE `movie_listings`(
     `genre` VARCHAR(255), 
     `duration_in_minutes` INT, 
     `mpaa_rating` VARCHAR(255), 
-    `record_creration_date` DATETIME NOT NULL, 
-    `record_last_modification_date` DATETIME NOT NULL, 
+    `record_creation_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    `record_last_modification_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
     PRIMARY KEY (`id`) 
 ); 
 
@@ -18,7 +18,7 @@ CREATE TABLE user_authentication_accounts (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, 
     `username` VARCHAR(255), 
     `password` VARCHAR(255),
-    `record_creration_date` DATETIME NOT NULL, 
-    `record_last_modification_date` DATETIME NOT NULL,
+    `record_creation_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    `record_last_modification_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 );
