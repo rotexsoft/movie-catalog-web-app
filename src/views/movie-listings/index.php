@@ -5,6 +5,9 @@
             <h4>All Movies</h4>
         </div>
         <div class="small-6 columns text-right">
+            <a class="button" href="<?php echo s3MVC_MakeLink( "movie-listings/index?format=json" ); ?>">
+                <strong>Get Listings in JSON Format</strong>
+            </a>
             <a class="button" href="<?php echo s3MVC_MakeLink( "movie-listings/add" ); ?>">
                 <strong>+ Add new Movie Listing</strong>
             </a>

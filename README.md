@@ -1,8 +1,14 @@
-## Movie Catalog Demo Web App built using the [SlimPHP 3 Skeleton MVC App](https://github.com/rotexsoft/slim3-skeleton-mvc-app) 
+## Movie Catalog Demo Web App built using the [SlimPHP 3 Skeleton MVC App](https://github.com/rotexsoft/slim-skeleton-mvc-app)
+
+> THIS APP WAS DEVELOPED USING THE SLIM 3 VERSION OF THE MVC FRAMEWORK. 
+A NEWER AND BETTER VERSION OF THE MVC FRAMEWORK POWERED BY SLIM 4 WILL BE
+READY IN THE FIRST QUARTER OF 2023 & SHOULD BE USED TO BUILD NEW APPS.
+THIS APP WILL BE REWRITTEN IN A NEW REPO TO USE THE NEW VERSION OF THE 
+MVC FRAMEWORK AND A LINK TO THAT REPO WILL BE ADDED HERE.
 
 This repository contains the end result of the 
-[Real World Usage: Creating a Movie Catalog application](https://github.com/rotexsoft/slim3-skeleton-mvc-app/blob/master/documentation/MOVIE_CATALOG_APP_WALK_THROUGH.md) 
-tutorial for the [SlimPHP 3 Skeleton MVC App](https://github.com/rotexsoft/slim3-skeleton-mvc-app) framework. 
+[Real World Usage: Creating a Movie Catalog application](https://github.com/rotexsoft/slim-skeleton-mvc-app/blob/master/documentation/MOVIE_CATALOG_APP_WALK_THROUGH.md) 
+tutorial for the [SlimPHP 3 Skeleton MVC App](https://github.com/rotexsoft/slim-skeleton-mvc-app) framework. 
 
 To install this app, change directory into the directory this app was cloned into and run `composer install`
 
