@@ -4,7 +4,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=5.5.0",
+        "php": ">=7.4",
         "rotexsoft/slim-skeleton-mvc-tools": "3.0.*",
         "slim/flash": "^0.2.0",
         "rotexsoft/leanorm": "^1.1.1-RC2"
