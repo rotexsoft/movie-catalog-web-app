@@ -26,7 +26,7 @@ Install composer dependencies
 composer install
 ```
 
-Edit the `db_*` settings in ./config/app-settings.php to point to the db you just created
+Edit the `db_*` settings in **./config/app-settings.php** to point to the db you just created
 
 Run the dev web-server
 
