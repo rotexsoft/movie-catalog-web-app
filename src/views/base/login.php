@@ -1,11 +1,14 @@
 <?php
-    $prepend_action = !S3MVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
+    /** @var \Vespula\Locale\Locale $__localeObj */
+    /** @var \Rotexsoft\FileRenderer\Renderer $this */
+    /** @var \SlimMvcTools\Controllers\BaseController $controller_object */
+    $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
 
     $action = ($prepend_action) ? 'action-login' : 'login';
-    $login_path = s3MVC_MakeLink("/{$controller_object->controller_name_from_uri}/$action");
+    $login_path = $sMVC_MakeLink("/{$controller_object->getControllerNameFromUri()}/$action");
     
     $action1 = ($prepend_action) ? 'action-logout' : 'logout';
-    $logout_action_path = s3MVC_MakeLink("/{$controller_object->controller_name_from_uri}/$action1/0");
+    $logout_action_path = $sMVC_MakeLink("/{$controller_object->getControllerNameFromUri()}/$action1/0");
 ?>
 
 <?php if( !empty($error_message) ): ?>
@@ -18,36 +21,18 @@
     
     <form action="<?php echo $login_path; ?>" method="post">
         
-        <div class="row">
-            <div class="large-6 columns">
-                <div class="row collapse prefix-radius">
-                    <div class="small-3 columns">
-                        <span class="prefix">User Name: </span>
-                    </div>
-                    <div class="small-9 columns">
-                        <input type="text" name="username" placeholder="User Name" value="<?php echo $username; ?>">
-                    </div>
-                </div>
-            </div>
+        <div>
+            <span><?= $__localeObj->gettext('base_controller_text_user_name'); ?>: </span>
+            <input type="text" name="username" placeholder="<?= $this->escapeHtmlAttr( $__localeObj->gettext('base_controller_text_user_name') ); ?>" value="<?php echo $username; ?>">
         </div>
-
-        <div class="row">
-            <div class="large-6 columns">
-                <div class="row collapse prefix-radius">
-                    <div class="small-3 columns">
-                        <span class="prefix">Password: </span>
-                    </div>
-                    <div class="small-9 columns">
-                        <input type="password" name="password" autocomplete="off" placeholder="Password" value="<?php echo $password; ?>">
-                    </div>
-                </div>
-            </div>
+        <br>
+        <div>
+            <span><?= $__localeObj->gettext('base_controller_text_password'); ?>: </span>
+            <input type="password" name="password" autocomplete="off" placeholder="<?= $this->escapeHtmlAttr( $__localeObj->gettext('base_controller_text_password') ); ?>" value="<?php echo $password; ?>">
         </div>
-        
-        <div class="row">
-            <div class="large-6 columns push-4">
-                <input type="submit" value="Login" class="button radius">
-            </div>
+        <br>
+        <div>
+            <input type="submit" value="<?= $this->escapeHtmlAttr( $__localeObj->gettext('base_controller_text_login') ); ?>">
         </div>
 
     </form>
@@ -56,7 +41,7 @@
     
     <form action="<?php echo $logout_action_path; ?>" method="post">
         
-      <input type="submit" value="Logout">
+      <input type="submit" value="<?= $this->escapeHtmlAttr( $__localeObj->gettext('base_controller_text_logout') ); ?>">
       
     </form>
     

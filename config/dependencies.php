@@ -1,94 +1,54 @@
-<?php  //Dependencies
+<?php
+use \SlimMvcTools\ContainerKeys,
+    \SlimMvcTools\Controllers\BaseController;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Start configuration specific to all environments
+// Configure all the dependencies you'll need in your application in this file.
+//
+// Also call all the needed Setters on \Slim\Factory\AppFactory at the very end
+// of this file right before the return statement in this file.
 ////////////////////////////////////////////////////////////////////////////////
-                                      
-$container['logger'] = function () {
 
+// $container must be an instance of \Psr\Container\ContainerInterface
+// It must be returned at the end of this file.
+$container = new \SlimMvcTools\Container();
+$container[ContainerKeys::APP_SETTINGS] = $app_settings;
+
+// See https://learn.microsoft.com/en-us/cpp/c-runtime-library/language-strings?view=msvc-170
+$container[ContainerKeys::DEFAULT_LOCALE] = 'en_US';
+$container[ContainerKeys::VALID_LOCALES] = ['en_US', 'fr_CA']; // add more values for languages you will be supporting in your application
+$container[ContainerKeys::LOCALE_OBJ] = function ($c) { // An object managing localized strings
+
+    // See https://packagist.org/packages/vespula/locale
+    $ds = DIRECTORY_SEPARATOR;
+    $locale_obj = new \Vespula\Locale\Locale($c[ContainerKeys::DEFAULT_LOCALE]);
+    $path_2_locale_language_files = SMVC_APP_ROOT_PATH.$ds.'config'.$ds.'languages';        
+    $locale_obj->load($path_2_locale_language_files); //load local entries for base controller
+    
+    // Try to update to previously selected language if stored in session
+    if (
+        session_status() === PHP_SESSION_ACTIVE
+        && array_key_exists(BaseController::SESSN_PARAM_CURRENT_LOCALE_LANG, $_SESSION)
+    ) {
+        $locale_obj->setCode($_SESSION[BaseController::SESSN_PARAM_CURRENT_LOCALE_LANG]);
+    }
+    
+    return $locale_obj;
+};
+
+// A PSR 3 / PSR Log Compliant logger
+$container[ContainerKeys::LOGGER] = function () {
+    
+    // See https://packagist.org/packages/vespula/log
     $ds = DIRECTORY_SEPARATOR;
     $log_type = \Vespula\Log\Adapter\ErrorLog::TYPE_FILE;
-    $file = S3MVC_APP_ROOT_PATH . "{$ds}logs{$ds}daily_log_" . date('Y_M_d') . '.txt';
-    
+    $file = SMVC_APP_ROOT_PATH . "{$ds}logs{$ds}daily_log_" . date('Y_M_d') . '.txt';
     $adapter = new \Vespula\Log\Adapter\ErrorLog($log_type , $file);
     $adapter->setMessageFormat('[{timestamp}] [{level}] {message}');
     $adapter->setMinLevel(Psr\Log\LogLevel::DEBUG);
     $adapter->setDateFormat('Y-M-d g:i:s A');
     
-    return new \Vespula\Log\Log($adapter);
-};
-
-// this MUST be replaced with any subclass of \\Slim3MvcTools\\Controllers\\BaseController
-$container['errorHandlerClass'] = \MovieCatalog\Controllers\HttpNotAllowedNotFoundServerErrorHandler::class;
-
-//Override the default 500 System Error Handler
-$container['errorHandler'] = function ($c) {
-    
-    return function (
-            \Psr\Http\Message\ServerRequestInterface $request, 
-            \Psr\Http\Message\ResponseInterface $response, 
-            \Exception $exception
-          ) use ($c) {
-        
-        $errorHandlerClass = $c['errorHandlerClass'];
-        $errorHandler = new $errorHandlerClass( $c, '', '', $request, $response);
-
-        $response_from_pre_action = $errorHandler->preAction();
-        
-        // invoke the server error handler
-        $action_response = $errorHandler->generateServerErrorResponse($exception, $request, $response_from_pre_action);
-        
-        return $errorHandler->postAction($action_response);
-    };
-};
-
-// this MUST be replaced with any subclass of \\Slim3MvcTools\\Controllers\\BaseController
-$container['notFoundHandlerClass'] = \MovieCatalog\Controllers\HttpNotAllowedNotFoundServerErrorHandler::class;
-
-//Override the default Not Found Handler
-$container['notFoundHandler'] = function ($c) {
-    
-    return function (
-                \Psr\Http\Message\ServerRequestInterface $request, 
-                \Psr\Http\Message\ResponseInterface $response,
-                $_404_page_contents_str = null,
-                $_404_page_additional_log_msg = null
-            ) use ($c) {
- 
-        $notFoundHandlerClass = $c['notFoundHandlerClass'];
-        $notFoundHandler = new $notFoundHandlerClass( $c, '', '', $request, $response);
-        
-        $notFoundHandler->setResponse( $notFoundHandler->preAction() );
-        
-        //invoke the not found handler
-        $action_response = $notFoundHandler->actionHttpNotFound($_404_page_contents_str, $_404_page_additional_log_msg);
-        
-        return $notFoundHandler->postAction($action_response);
-    };
-};
-
-// this MUST be replaced with any subclass of \\Slim3MvcTools\\Controllers\\BaseController
-$container['notAllowedHandlerClass'] = \MovieCatalog\Controllers\HttpNotAllowedNotFoundServerErrorHandler::class;
-
-//Override the default Not Allowed Handler
-$container['notAllowedHandler'] = function ($c) {
-    
-    return function (
-                \Psr\Http\Message\ServerRequestInterface $request, 
-                \Psr\Http\Message\ResponseInterface $response, 
-                $methods
-            ) use ($c) {
-        
-        $notAllowedHandlerClass = $c['notAllowedHandlerClass'];
-        $notAllowedHandler = new $notAllowedHandlerClass( $c, '', '', $request, $response);
-
-        $response_from_pre_action = $notAllowedHandler->preAction();
-        
-        // invoke the notAllowed handler
-        $action_response = $notAllowedHandler->generateNotAllowedResponse($methods, $request, $response_from_pre_action);
-        
-        return $notAllowedHandler->postAction($action_response);
-    };
+    return new \Vespula\Log\Log('error-log', $adapter);
 };
 
 //Add the namespcace(s) for your web-app's controller classes or leave it
@@ -96,136 +56,98 @@ $container['notAllowedHandler'] = function ($c) {
 //The namespaces are searched in the order which they are added 
 //to the array. It would make sense to add the namespaces for your
 //application in the front part of these arrays so that if a controller class 
-//exists in \Slim3MvcTools\Controllers\ and / or \Slim3SkeletonMvcApp\Controllers\  
+//exists in \SlimMvcTools\Controllers\ and / or \SlimSkeletonMvcApp\Controllers\  
 //and in your application's controller namespace(s) controllers
 //in your application's namespaces are 
 //Make sure you add the trailing slashes.
-$container['namespaces_for_controllers'] = ['\\Slim3MvcTools\\Controllers\\', '\\Slim3SkeletonMvcApp\\Controllers\\', '\\MovieCatalog\\Controllers\\' ];
+$container[ContainerKeys::NAMESPACES_4_CONTROLLERS] = [
+    '\\SlimMvcTools\\Controllers\\', 
+    '\\SlimSkeletonMvcApp\\Controllers\\',
+    '\\MovieCatalog\\Controllers\\',
+];
 
-//Object for rendering layout files
-$container['new_layout_renderer'] = $container->factory(function () {
+// Object for rendering layout files
+$container[ContainerKeys::LAYOUT_RENDERER]  = $container->factory(function ($c) {
     
-    //return a new instance on each access to $container['new_layout_renderer']
+    // See https://github.com/rotexsoft/file-renderer
+    // Return a new instance on each access to 
+    // $container[ContainerKeys::LAYOUT_RENDERER]
     $ds = DIRECTORY_SEPARATOR;
-    $path_2_layout_files = S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'layout-templates';
+    $path_2_layout_files = SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'layout-templates';
     $layout_renderer = new \Rotexsoft\FileRenderer\Renderer('', [], [$path_2_layout_files]);
+    $layout_renderer->setVar('__localeObj', $c[ContainerKeys::LOCALE_OBJ]);
     
     return $layout_renderer;
 });
 
-//Object for rendering view files
-$container['new_view_renderer'] = $container->factory(function () {
+// Object for rendering view files
+$container[ContainerKeys::VIEW_RENDERER] = $container->factory(function ($c) {
     
-    //return a new instance on each access to $container['new_view_renderer']
+    // See https://github.com/rotexsoft/file-renderer
+    // Return a new instance on each access to 
+    // $container[ContainerKeys::VIEW_RENDERER]
     $ds = DIRECTORY_SEPARATOR;
-    $path_2_view_files = S3MVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'."{$ds}base";
+    $path_2_view_files = SMVC_APP_ROOT_PATH.$ds.'src'.$ds.'views'."{$ds}base";
     $view_renderer = new \Rotexsoft\FileRenderer\Renderer('', [], [$path_2_view_files]);
+    $view_renderer->setVar('__localeObj', $c[ContainerKeys::LOCALE_OBJ]);
 
     return $view_renderer;
 });
 
-////////////////////////////////////////////////////////////////////////////////
-// End configuration specific to all environments
-////////////////////////////////////////////////////////////////////////////////
-
 ////////////////////////////////////////////////////////////////////////////
-// Start Vespula.Auth Authentication setup
-////////////////////////////////////////////////////////////////////////////   
+// Start Vespula.Auth PDO Authentication setup
+// 
+// You should use a proper database like mysql or postgres or other
+// adapters like LDAP for performing authentication in your applications.
+// 
+// \SlimMvcTools\Controllers\BaseController->actionLogin will work out of 
+// the box with any properly configured \Vespula\Auth\Adapter\* instance.
+$container[ContainerKeys::VESPULA_AUTH] = function ($c) {
 
-if( s3MVC_GetCurrentAppEnvironment() === S3MVC_APP_ENV_PRODUCTION ) {
-    
-    //configuration specific to the production environment
-    
-    ////////////////////////////////////////////////////////////////////////////
-    // Start Vespula.Auth LDAP Authentication setup
-    ////////////////////////////////////////////////////////////////////////////    
-    $container['vespula_auth'] = function ($c) {
-        
-        //Optionally pass a maximum idle time and a time until the session 
-        //expires (in seconds)
-        $expire = 3600;
-        $max_idle = 1200;
-        $session = new \Vespula\Auth\Session\Session($max_idle, $expire, 'VESPULA_AUTH_DATA_'.S3MVC_APP_ROOT_PATH);
+    $pdo = new \PDO(
+        $c[ContainerKeys::APP_SETTINGS]['db_dsn'],
+        $c[ContainerKeys::APP_SETTINGS]['db_user_name'],
+        $c[ContainerKeys::APP_SETTINGS]['db_password'], 
+        [
+            \PDO::ATTR_PERSISTENT => true,
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
+        ]
+    );
 
-        $bind_options = $c->get('settings')['bind_options'];
+    //Optionally pass a maximum idle time and a time until the session 
+    //expires (in seconds)
+    $expire = 3600;
+    $max_idle = 1200;
+    $session = new \Vespula\Auth\Session\Session($max_idle, $expire);
 
-        $ldap_options = [
-            LDAP_OPT_PROTOCOL_VERSION=>3
-        ];
-        
-        $attributes = [
-            'email',
-            'givenname'
-        ];
+    $cols = ['username', 'password'];
+    $from = 'user_authentication_accounts';
+    $where = ''; //optional
 
-        $uri = $c->get('settings')['ldap_server_addr'];
-        $dn = null;
-        
-        $adapter = new \Vespula\Auth\Adapter\Ldap(
-                        $uri, $dn, $bind_options, $ldap_options, $attributes
-                    );
-        
-        return new \Vespula\Auth\Auth($adapter, $session);
-    };
-    ////////////////////////////////////////////////////////////////////////////
-    // End Vespula.Auth LDAP Authentication setup
-    ////////////////////////////////////////////////////////////////////////////
-    
-} else {
-    
-    //configuration specific to non-production environments
-    
-    ////////////////////////////////////////////////////////////////////////////
-    // Start Vespula.Auth PDO Authentication setup
-    ////////////////////////////////////////////////////////////////////////////
-    $container['vespula_auth'] = function ($c) {
-        
-        $pdo = new \PDO(
-                    $c['db_dsn'],
-                    $c['db_uname'], 
-                    $c['db_passwd'], 
-                    [
-                        PDO::ATTR_PERSISTENT => true, 
-                        PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION
-                    ]
-                ); 
-        
-        $pass1 = password_hash('admin' , PASSWORD_DEFAULT);
-        $pass2 = password_hash('root' , PASSWORD_DEFAULT);
+    $adapter = new \Vespula\Auth\Adapter\Sql($pdo, $from, $cols, $where);
 
-//        $sql = <<<SQL
-//DROP TABLE IF EXISTS "user_authentication_accounts";
-//CREATE TABLE user_authentication_accounts (
-//    username VARCHAR(255), password VARCHAR(255)
-//);
-//INSERT INTO "user_authentication_accounts" VALUES( 'admin', '$pass1' );
-//INSERT INTO "user_authentication_accounts" VALUES( 'root', '$pass2' );
-//SQL;
-//        $pdo->exec($sql); //add two default user accounts
-        
-        //Optionally pass a maximum idle time and a time until the session 
-        //expires (in seconds)
-        $expire = 3600;
-        $max_idle = 1200;
-        $session = new \Vespula\Auth\Session\Session($max_idle, $expire);
-        
-        $cols = ['username', 'password'];
-        $from = 'user_authentication_accounts';
-        $where = ''; //optional
-
-        $adapter = new \Vespula\Auth\Adapter\Sql($pdo, $from, $cols, $where);
-        
-        return new \Vespula\Auth\Auth($adapter, $session);
-    };
-    ////////////////////////////////////////////////////////////////////////////
-    // End Vespula.Auth PDO Authentication setup
-    ////////////////////////////////////////////////////////////////////////////
-}
+    return new \Vespula\Auth\Auth($adapter, $session);
+};
 ////////////////////////////////////////////////////////////////////////////
-// End Vespula.Auth Authentication setup
+// End Vespula.Auth PDO Authentication setup
 ////////////////////////////////////////////////////////////////////////////
 
-$container['slim_flash'] = function () {
+// New PSR 7 Request Object
+$container[ContainerKeys::NEW_REQUEST_OBJECT]  = $container->factory(function ($c) {
+    
+    $serverRequestCreator = \Slim\Factory\ServerRequestCreatorFactory::create();
+    return $serverRequestCreator->createServerRequestFromGlobals();
+});
+
+// New PSR 7 Response Object
+$container[ContainerKeys::NEW_RESPONSE_OBJECT]  = $container->factory(function ($c) {
+    
+    $responseFactory = \Slim\Factory\AppFactory::determineResponseFactory();
+    return $responseFactory->createResponse();
+});
+
+$container[\Slim\Flash\Messages::class] = function () {
 
     if ( session_status() !== PHP_SESSION_ACTIVE ) { 
         
@@ -236,46 +158,31 @@ $container['slim_flash'] = function () {
     return new \Slim\Flash\Messages();
 };
 
-$container['db_dsn'] =  $container->get('settings')['db_dsn'];
-$container['db_uname'] = $container->get('settings')['db_uname'];
-$container['db_passwd'] = $container->get('settings')['db_passwd'];
+$container[\MovieCatalog\Models\MoviesListings\MoviesListingsModel::class] = function ($c) {
 
-$container['movie_listings_model'] = function ($c) {
-
-    $model = new \BaseModel (
-        $c['db_dsn'], $c['db_uname'], $c['db_passwd'],
-        [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'],
-        [
-            'primary_col' => 'id',
-            'table_name' => 'movie_listings',
-
-            //If not set, \LeanOrm\Model\Collection will be used by default
-            'collection_class_name' => 'BaseCollection',
-
-            //If not set, \LeanOrm\Model\Record will be used by default 
-            'record_class_name' => 'BaseRecord',
-        ]
+    return new \MovieCatalog\Models\MoviesListings\MoviesListingsModel(
+        $c[ContainerKeys::APP_SETTINGS]['db_dsn'],
+        $c[ContainerKeys::APP_SETTINGS]['db_user_name'],
+        $c[ContainerKeys::APP_SETTINGS]['db_password'],
+        [\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
     );
-
-    return $model;
 };
 
-$container['users_model'] = function ($c) {
+$container[\MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class] = function ($c) {
 
-    $model = new \BaseModel (
-        $c['db_dsn'], $c['db_uname'], $c['db_passwd'],
-        [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'],
-        [
-            'primary_col' => 'id',
-            'table_name' => 'user_authentication_accounts',
-
-            //If not set, \LeanOrm\Model\Collection will be used by default
-            'collection_class_name' => 'BaseCollection',
-
-            //If not set, \LeanOrm\Model\Record will be used by default 
-            'record_class_name' => 'BaseRecord',
-        ]
+    return new \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel(
+        $c[ContainerKeys::APP_SETTINGS]['db_dsn'],
+        $c[ContainerKeys::APP_SETTINGS]['db_user_name'],
+        $c[ContainerKeys::APP_SETTINGS]['db_password'],
+        [\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
     );
-
-    return $model;
 };
+
+
+////////////////////////////////////////////////////////////////////////////
+// Call all the needed Setters on \Slim\Factory\AppFactory below here before
+// AppFactory::create() is called in index.php
+////////////////////////////////////////////////////////////////////////////
+\Slim\Factory\AppFactory::setContainer($container);
+
+return $container;

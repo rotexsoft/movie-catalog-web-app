@@ -1,6 +1,8 @@
 <?php
+declare(strict_types=1);
 
-class BaseCollection extends \LeanOrm\Model\Collection
-{
-    //put your code here
+namespace MovieCatalog\Models\Collections;
+
+class BaseCollection extends \LeanOrm\Model\Collection {
+    
 }

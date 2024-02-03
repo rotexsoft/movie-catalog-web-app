@@ -10,6 +10,7 @@ desktop.ini
 *.tmproj
 build
 .idea
+.phpunit.result.cache
 
 nbproject/
 /nbproject/
@@ -30,9 +31,12 @@ logs/*
 !logs/.htaccess
 
 !public/js/*/vendor
+public/.htaccess
 
 /config/app-settings.php
 /config/env.php
 
 tmp/session/*
 !tmp/session/.gitkeep
+
+leanorm-cli-config.php

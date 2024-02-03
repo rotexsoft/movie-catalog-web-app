@@ -1,8 +1,11 @@
 <?php
+declare(strict_types=1);
 
-class BaseRecord extends \LeanOrm\Model\Record
-{   
-    public function getDateCreated() {
+namespace MovieCatalog\Models\Records;
+
+class BaseRecord extends \LeanOrm\Model\Record {
+
+    public function getDateCreated(): string {
         
         $col = $this->getModel()->getCreatedTimestampColumnName();
         
@@ -14,7 +17,7 @@ class BaseRecord extends \LeanOrm\Model\Record
         return '';
     }
     
-    public function getLastModfiedDate() {
+    public function getLastModfiedDate(): string {
         
         $col = $this->getModel()->getUpdatedTimestampColumnName();
         

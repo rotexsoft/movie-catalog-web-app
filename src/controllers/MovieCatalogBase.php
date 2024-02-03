@@ -1,12 +1,14 @@
 <?php
 namespace MovieCatalog\Controllers;
+
+use \Psr\Container\ContainerInterface;
+use \Psr\Http\Message\ResponseInterface;
+use \Psr\Http\Message\ServerRequestInterface;
+
 /**
- * 
  * Description of MovieCatalogBase goes here
- *
- * 
  */
-class MovieCatalogBase extends \Slim3MvcTools\Controllers\BaseController
+class MovieCatalogBase extends \SlimMvcTools\Controllers\BaseController
 {   
     /**
      * 
@@ -15,7 +17,7 @@ class MovieCatalogBase extends \Slim3MvcTools\Controllers\BaseController
      * 
      * @var string
      */
-    protected $login_success_redirect_action = 'index';
+    protected string $login_success_redirect_action = 'index';
     
     /**
      * 
@@ -24,30 +26,16 @@ class MovieCatalogBase extends \Slim3MvcTools\Controllers\BaseController
      * 
      * @var string
      */
-    protected $login_success_redirect_controller = 'movie-catalog-base';
+    protected string $login_success_redirect_controller = 'movie-catalog-base';
     
-    /**
-     * 
-     * @param \Psr\Container\ContainerInterface $container
-     * @param string $controller_name_from_uri
-     * @param string $action_name_from_uri
-     * @param \Psr\Http\Message\ServerRequestInterface $req
-     * @param \Psr\Http\Message\ResponseInterface $res
-     * 
-     */
     public function __construct(
-        \Psr\Container\ContainerInterface $container, $controller_name_from_uri, $action_name_from_uri, 
-        \Psr\Http\Message\ServerRequestInterface $req, \Psr\Http\Message\ResponseInterface $res
+        ContainerInterface $container, 
+        string $controller_name_from_uri, 
+        string $action_name_from_uri,
+        ServerRequestInterface $req, 
+        ResponseInterface $res
     ) {
         parent::__construct($container, $controller_name_from_uri, $action_name_from_uri, $req, $res);
-    }
-    
-    public function actionIndex() {
-        
-        //get the contents of the view first
-        $view_str = $this->renderView('index.php');
-        
-        return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
     protected function doDelete($id, $model_key_name_in_container) {
@@ -68,24 +56,22 @@ class MovieCatalogBase extends \Slim3MvcTools\Controllers\BaseController
         }
 
         // get model object
-        $model_obj = $this->container->get($model_key_name_in_container);
+        $model_obj = $this->getContainerItem($model_key_name_in_container);
         
         // fetch the record
-        $record = $model_obj->fetch($id);
+        $record = $model_obj->fetchOneByPkey($id);
         
-        if( !($record instanceof \BaseRecord) ) {
+        if( !($record instanceof \MovieCatalog\Models\Records\BaseRecord) ) {
             
             // Could not find record with the specified $id
-            return $this->generateNotFoundResponse(
-                        $this->request, 
-                        $this->response,
-                        'Requested item could not be deleted. It does not exist.'
-                    );
+            $this->forceHttp404(
+                'Requested item could not be deleted. It does not exist.'
+            );
         }
         
         // We will be redirecting to the default action of the current 
         // controller
-        $rdr_path = s3MVC_MakeLink("{$this->controller_name_from_uri}");
+        $rdr_path = $this->makeLink("{$this->controller_name_from_uri}");
         
         if ( $record->delete() === false ) {
             
@@ -99,10 +85,21 @@ class MovieCatalogBase extends \Slim3MvcTools\Controllers\BaseController
         }
         
         // Redirect to the default action of the current controller
-        return $this->response->withHeader('Location', $rdr_path);
+        return $this->response->withStatus(302)->withHeader('Location', $rdr_path);
     }
     
-    public function preAction() {
+    /**
+     * @return \Psr\Http\Message\ResponseInterface|string
+     */
+    public function actionIndex() {
+        
+        //get the contents of the view first
+        $view_str = $this->renderView('index.php', ['controller_object'=>$this]);
+        
+        return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
+    }
+    
+    public function preAction(): ResponseInterface {
         
         // add code that you need to be executed before each controller action method is executed
         $response = parent::preAction();
@@ -110,7 +107,7 @@ class MovieCatalogBase extends \Slim3MvcTools\Controllers\BaseController
         return $response;
     }
     
-    public function postAction(\Psr\Http\Message\ResponseInterface $response) {
+    public function postAction(ResponseInterface $response): ResponseInterface {
         
         // add code that you need to be executed after each controller action method is executed
         $new_response = parent::postAction($response);
@@ -118,63 +115,58 @@ class MovieCatalogBase extends \Slim3MvcTools\Controllers\BaseController
         return $new_response;
     }
     
-    public function renderLayout($file_name, array $data=[]) {
+    public function renderLayout(string $file_name, array $data=[]): string {
         
         // define common layout variables
         $common_layout_data = [];
-        $common_layout_data['content'] = 'Content Goes Here!';
-        $common_layout_data['is_logged_in'] = $this->isLoggedIn();
         $common_layout_data['last_flash_message'] = $this->getLastFlashMessage();
-        $common_layout_data['action_name_from_uri'] = $this->action_name_from_uri;
-        $common_layout_data['controller_name_from_uri'] = $this->controller_name_from_uri;
         $common_layout_data['last_flash_message_css_class'] = $this->getLastFlashMessageCssClass();
-        $common_layout_data['logged_in_users_username'] = 
-                    $this->isLoggedIn() ? $this->container->get('vespula_auth')->getUsername() : '';
         
-        return parent::renderLayout($file_name, array_merge( $common_layout_data, $data ) );
+        return parent::renderLayout(
+            $file_name, array_merge( $common_layout_data, $data ) 
+        );
     }
     
-    public function renderView($file_name, array $data=[]) {
+    public function renderView(string $file_name, array $data=[]): string {
         
-        // define common view variables
+        // define common variables
         $common_layout_data = [];
-        $common_layout_data['is_logged_in'] = $this->isLoggedIn();
-        $common_layout_data['action_name_from_uri'] = $this->action_name_from_uri;
-        $common_layout_data['controller_name_from_uri'] = $this->controller_name_from_uri;
-        $common_layout_data['logged_in_users_username'] = 
-            $this->isLoggedIn() ? $this->container->get('vespula_auth')->getUsername() : '';
+        $common_layout_data['last_flash_message'] = $this->getLastFlashMessage();
+        $common_layout_data['last_flash_message_css_class'] = $this->getLastFlashMessageCssClass();
         
-        return parent::renderView($file_name, array_merge( $common_layout_data, $data ) );
+        return parent::renderView(
+            $file_name, array_merge( $common_layout_data, $data ) 
+        );
     }
     
     protected function setErrorFlashMessage($msg) {
         
         $this->setFlashMessage($msg);
-        $this->setFlashMessageCssClass('alert');
+        $this->setFlashMessageCssClass('red');
     }
 
     protected function setSuccessFlashMessage($msg) {
         
         $this->setFlashMessage($msg);
-        $this->setFlashMessageCssClass('success');
+        $this->setFlashMessageCssClass('teal lighten-2');
     }
 
     protected function setWarningFlashMessage($msg) {
         
         $this->setFlashMessage($msg);
-        $this->setFlashMessageCssClass('warning');
+        $this->setFlashMessageCssClass('deep-orange darken-1');
     }
     
     protected function setFlashMessage($msg) {
 
         $msg_key = 'curr_msg';
-        $this->container->get('slim_flash')->addMessage($msg_key, $msg);
+        $this->getContainerItem(\Slim\Flash\Messages::class)->addMessage($msg_key, $msg);
     }
 
     protected function getLastFlashMessage() {
 
         $msg_key = 'curr_msg';
-        $messages = $this->container->get('slim_flash')->getMessage($msg_key);
+        $messages = $this->getContainerItem(\Slim\Flash\Messages::class)->getMessage($msg_key);
 
         if( is_array($messages) && count($messages) === 1 ) {
             
@@ -186,13 +178,13 @@ class MovieCatalogBase extends \Slim3MvcTools\Controllers\BaseController
     protected function setFlashMessageCssClass($css_class) {
 
         $msg_key = 'curr_msg_css_class';
-        $this->container->get('slim_flash')->addMessage($msg_key, $css_class);
+        $this->getContainerItem(\Slim\Flash\Messages::class)->addMessage($msg_key, 'card-panel pulse ' . $css_class);
     }
 
     protected function getLastFlashMessageCssClass() {
 
         $msg_key = 'curr_msg_css_class';
-        $messages = $this->container->get('slim_flash')->getMessage($msg_key);
+        $messages = $this->getContainerItem(\Slim\Flash\Messages::class)->getMessage($msg_key);
         
         if( is_array($messages) && count($messages) > 0 ) {
             

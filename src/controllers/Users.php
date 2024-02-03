@@ -1,6 +1,13 @@
 <?php
 namespace MovieCatalog\Controllers;
 
+use \Psr\Container\ContainerInterface;
+use \Psr\Http\Message\ResponseInterface;
+use \Psr\Http\Message\ServerRequestInterface;
+
+/**
+ * Description of Users goes here
+ */
 class Users extends \MovieCatalog\Controllers\MovieCatalogBase
 {   
     /**
@@ -10,7 +17,7 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
      * 
      * @var string
      */
-    protected $login_success_redirect_action = 'index';
+    protected string $login_success_redirect_action = 'index';
     
     /**
      * 
@@ -19,68 +26,38 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
      * 
      * @var string
      */
-    protected $login_success_redirect_controller = 'users';
+    protected string $login_success_redirect_controller = 'users';
     
-    /**
-     * 
-     * @param \Psr\Container\ContainerInterface $container
-     * @param string $controller_name_from_uri
-     * @param string $action_name_from_uri
-     * @param \Psr\Http\Message\ServerRequestInterface $req
-     * @param \Psr\Http\Message\ResponseInterface $res
-     * 
-     */
     public function __construct(
-        \Psr\Container\ContainerInterface $container, $controller_name_from_uri, $action_name_from_uri, 
-        \Psr\Http\Message\ServerRequestInterface $req, \Psr\Http\Message\ResponseInterface $res
+        ContainerInterface $container, 
+        string $controller_name_from_uri, 
+        string $action_name_from_uri,
+        ServerRequestInterface $req, 
+        ResponseInterface $res
     ) {
         parent::__construct($container, $controller_name_from_uri, $action_name_from_uri, $req, $res);
     }
     
+    /**
+     * @return \Psr\Http\Message\ResponseInterface|string
+     */
     public function actionIndex() {
         
         $view_data = [];
-        $model_obj = $this->container->get('users_model');
+        $model_class = 
+            \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class;
+        
+        $model_obj = $this->getContainerItem($model_class);
         
         // Grab all existing user records.
         // Note that the variable $collection_of_user_records will be available
         // in your index.php view (in this case ./src/views/users/index.php)
         // when $this->renderView('index.php', $view_data) is called.
-        $view_data['collection_of_user_records'] = 
-                    $model_obj->fetchRecordsIntoCollection();
+        $view_data['collection_of_user_records'] = $model_obj->fetchRecordsIntoCollection();
         
         //render the view first and capture the output
         $view_str = $this->renderView('index.php', $view_data);
         
-        return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
-    }
-    
-    public function actionView($id) {
-        
-        $model_obj = $this->container->get('users_model');
-        $view_data = [];
-        
-        // Grab record for the user whose id was specified.
-        // Note that the variable $user_record will be available
-        // in your view.php view (in this case ./src/views/users/view.php)
-        // when $this->renderView('view.php', $view_data) is called.
-        $view_data['user_record'] = $model_obj->fetch($id);
-        
-        if( !($view_data['user_record'] instanceof \BaseRecord) ) {
-            
-            // We could not find any user with the specified id in the database.
-            // Generate and return an http 404 resposne.
-            return $this->generateNotFoundResponse(
-                            $this->request, 
-                            $this->response,
-                            'Requested user does not exist.',
-                            'Requested user does not exist.'
-                        );
-        }
-        
-        //get the contents of the view first
-        $view_str = $this->renderView('view.php', $view_data);
-
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
@@ -101,19 +78,18 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
             return $login_response;
         }
         
-        $model_obj = $this->container->get('users_model');
+        $model_class = 
+            \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class;
+        /** @var \MovieCatalog\Models\BaseModel $model_obj */
+        $model_obj = $this->getContainerItem($model_class);
         $error_msgs = [];
         $error_msgs['form-errors'] = [];
         $error_msgs['username'] = [];
         $error_msgs['password'] = [];
         
-        // create an associative array with keys being the names of the columns in the 
-        // db table associated with the model and a default value of '' for each item 
-        // in the array
-        $default_data = array_combine( 
-            $model_obj->getTableColNames(), 
-            array_fill(0, count($model_obj->getTableColNames()), '') 
-        );
+        // An associative array with keys being the names of the columns in the db table 
+        // associated with the model and a default value of '' for each item in the array
+        $default_data = $model_obj->getDefaultColVals();
         
         // remove item whose key is primary key column name
         // since primary key values are auto-generated
@@ -128,7 +104,7 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
             $has_field_errors = false;
             
             // Read the post data
-            $posted_data = s3MVC_GetSuperGlobal('post');
+            $posted_data = sMVC_GetSuperGlobal('post');
             
             if( mb_strlen( ''.$posted_data['username'], 'UTF-8') <= 0 ) {
                 
@@ -139,13 +115,15 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
                 
                 // check that posted username is not already assigned to an
                 // existing user
-                $params = [
-                    'where' => [['col'=>'username', 'op'=>'=', 'val'=>$posted_data['username']]]
-                ];
-
-                $existing_user_with_same_username = $model_obj->fetchOneRecord($params);
+                $existing_user_with_same_username = 
+                    $model_obj->fetchOneRecord(
+                        $model_obj->getSelect()
+                                  ->where(
+                                    ' username = ? ', [$posted_data['username']]
+                                  )
+                    );
                 
-                if( $existing_user_with_same_username instanceof \BaseRecord ) {
+                if( $existing_user_with_same_username instanceof \MovieCatalog\Models\Records\BaseRecord ) {
                     
                     // username is already assigned to an existing user
                     $error_msgs['username'][] = 'Username already taken!';
@@ -171,11 +149,11 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
                 if ( $record->save() !== false ) {
 
                     //successfully saved;
-                    $rdr_path = s3MVC_MakeLink("users/index");
+                    $rdr_path = $this->makeLink("users/index");
                     $this->setSuccessFlashMessage('Successfully Saved!');
 
                     // re-direct to the list all users page
-                    return $this->response->withHeader('Location', $rdr_path);
+                    return $this->response->withStatus(302)->withHeader('Location', $rdr_path);
                     
                 } else {
 
@@ -196,7 +174,7 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
         
         $view_str = $this->renderView('add.php', $view_data);
         
-        return $this->renderLayout('main-template.php', ['content'=>$view_str]);
+        return $this->renderLayout($this->layout_template_file_name, ['content'=>$view_str]);
     }
     
     public function actionEdit($id) {
@@ -216,23 +194,22 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
             return $login_response;
         }
         
-        $model_obj = $this->container->get('users_model');
+        $model_class = 
+            \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class;
+        /** @var \MovieCatalog\Models\BaseModel $model_obj */
+        $model_obj = $this->getContainerItem($model_class);
         $error_msgs = [];
         $error_msgs['form-errors'] = [];
         $error_msgs['username'] = [];
         $error_msgs['password'] = [];
         
         // fetch the record for the user with the specified $id
-        $record = $model_obj->fetch($id);
+        $record = $model_obj->fetchOneByPkey($id);
         
-        if( !($record instanceof \BaseRecord) ) {
+        if( !($record instanceof \MovieCatalog\Models\Records\BaseRecord) ) {
             
             // Could not find record for the user with the specified $id
-            return $this->generateNotFoundResponse(
-                            $this->request, 
-                            $this->response,
-                            'Requested user does not exist.'
-                        );
+            $this->forceHttp404('Requested user does not exist.');
         }
         
         if( $this->request->getMethod() === 'POST' ) {
@@ -241,7 +218,7 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
             $has_field_errors = false;
             
             // Read the post data
-            $posted_data = s3MVC_GetSuperGlobal('post');
+            $posted_data = sMVC_GetSuperGlobal('post');
             
             if( mb_strlen( ''.$posted_data['username'], 'UTF-8') <= 0 ) {
                 
@@ -249,19 +226,16 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
                 $has_field_errors = true;
                 
             } else {
-                
                 // check that posted username is not already assigned to an
                 // existing user (except the user with the value of $id)
-                $params = [
-                    'where' => [
-                        [ 'col' => 'username', 'op' => '=', 'val'=>$posted_data['username'] ],
-                        [ 'col' => 'id', 'op' => '!=', 'val' => $id ],
-                    ]
-                ];
-
-                $existing_user_with_same_username = $model_obj->fetchOneRecord($params);
+                $existing_user_with_same_username = 
+                    $model_obj->fetchOneRecord(
+                        $model_obj->getSelect()
+                                  ->where(' username = :username ', ['username' => $posted_data['username']])
+                                  ->where(' id != :id ', ['id' => $id])
+                    );
                 
-                if( $existing_user_with_same_username instanceof \BaseRecord ) {
+                if( $existing_user_with_same_username instanceof \MovieCatalog\Models\Records\BaseRecord ) {
 
                     // username is already assigned to an existing user
                     $error_msgs['username'][] = 'Username already taken!';
@@ -269,14 +243,15 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
                 }
             }
 
-
             //load posted data into record object
             $record->username = $posted_data['username'];
 
             if ( !$has_field_errors ) {
                 
-                if( $posted_data['password'] !== '' && !password_verify(''.$posted_data['password'], $record->password) ) {
-                  
+                if( 
+                    $posted_data['password'] !== '' 
+                    && !password_verify(''.$posted_data['password'], $record->password) 
+                ) {
                     // only hash the password if it's different from the exisitng 
                     // hashed password
                     $record->password = password_hash(''.$posted_data['password'], PASSWORD_DEFAULT);
@@ -286,11 +261,11 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
                 if ( $record->save() !== false ) {
 
                     //successfully saved;
-                    $rdr_path = s3MVC_MakeLink("users/index");
+                    $rdr_path = $this->makeLink("users/index");
                     $this->setSuccessFlashMessage('Successfully Saved!');
 
                     // re-direct to the list all users page
-                    return $this->response->withHeader('Location', $rdr_path);
+                    return $this->response->withStatus(302)->withHeader('Location', $rdr_path);
                     
                 } else {
 
@@ -316,20 +291,54 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
     
     public function actionDelete($id) {
         
-        return $this->doDelete($id, 'users_model');
+        return $this->doDelete(
+            $id, 
+            \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class
+        );
+    }
+    
+    public function actionView($id) {
+        
+        $view_data = [];
+        $model_class = 
+            \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class;
+        $model_obj = $this->getContainerItem($model_class);
+        
+        // Grab record for the user whose id was specified.
+        // Note that the variable $user_record will be available
+        // in your view.php view (in this case ./src/views/users/view.php)
+        // when $this->renderView('view.php', $view_data) is called.
+        $view_data['user_record'] = $model_obj->fetchOneByPkey($id);
+        
+        if( !($view_data['user_record'] instanceof \MovieCatalog\Models\Records\BaseRecord) ) {
+            
+            // We could not find any user with the specified id in the database.
+            // Generate and return an http 404 resposne.
+            $this->forceHttp404('Requested user does not exist.');
+        }
+        
+        //get the contents of the view first
+        $view_str = $this->renderView('view.php', $view_data);
+
+        return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
     public function actionInitUsers($password) {
         
-        $view_str = ''; // will hold output to be injected into 
-                        // the site layout file (i.e. 
-                        // `./src/layout-templates/main-template.php`)
+        $view_str = ''; // will hold output to be injected into the site layout 
+                        // file (i.e. `./src/layout-templates/main-template.php`)
                         // when $this->renderLayout(...) is called
         
-        $model_obj = $this->container->get('users_model');
-        $num_existing_users = $model_obj->fetchValue(['cols'=>['count(*)']]);
-        
-        if( !is_numeric($num_existing_users) ) {
+        $model_obj = $this->getContainerItem(
+            \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class
+        );
+        $num_existing_users = 
+            $model_obj->fetchValue(
+                $model_obj->getSelect()
+                          ->cols(['count(*)'])
+            );
+
+        if( $num_existing_users === null) {
             
             // no need to add entries for the `record_creation_date`
             // and `record_last_modification_date` fields in the 
@@ -365,12 +374,11 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
         // The 'content' key in the array below will be available in
         // `./src/layout-templates/main-template.php` as $content
         // 
-        // Note: $this->layout_template_file_name has a value of
-        //       'main-template.php'
+        // Note: $this->layout_template_file_name has a value of 'main-template.php'
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
-    public function preAction() {
+    public function preAction(): ResponseInterface {
         
         // add code that you need to be executed before each controller action method is executed
         $response = parent::preAction();
@@ -378,7 +386,7 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
         return $response;
     }
     
-    public function postAction(\Psr\Http\Message\ResponseInterface $response) {
+    public function postAction(ResponseInterface $response): ResponseInterface {
         
         // add code that you need to be executed after each controller action method is executed
         $new_response = parent::postAction($response);

@@ -1,149 +1,234 @@
 <!doctype html>
-<html class="no-js" lang="en" dir="ltr">
+<?php
+    /** @var \Vespula\Locale\Locale $__localeObj */
+    /** @var \Rotexsoft\FileRenderer\Renderer $this */
+    /** @var \SlimMvcTools\Controllers\BaseController $controller_object */
+    
+    function makeMenuItemActive($links_controller_name, $controller_name_from_uri): string {
+
+        return ( trim($controller_name_from_uri) === trim($links_controller_name) ) ? 'active' : '';
+    }
+?>
+
+<html class="no-js" lang="<?= $__localeObj->getLanguageCode(); ?>" dir="ltr">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!--Let browser know website is optimized for mobile-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        
+        <!--Import Google Icon Font-->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        
+        <!--Import materialize.css-->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
         <title>Da Numba 1 Movie Catalog App</title>
-        <link rel="stylesheet" href="<?php echo s3MVC_MakeLink('/css/foundation/foundation.css'); ?>" />
-        <script src="<?php echo s3MVC_MakeLink('/js/foundation/vendor/jquery.js'); ?>"></script>
         
         <style>
-            /* style for menu items */
-            ul.menu li.active-link,
-            ul.menu li.active-link a{
-                color: #2e8acd;
+            .container {
+                width: 98%;
             }
-            ul.menu li.active-link{
-                background-color: orange;
+            
+            @media only screen and (min-width : 601px) and (max-width : 1260px) {
+                .toast {
+                    width: 100%;
+                    border-radius: 0;
+                }
+            }
+
+            @media only screen and (min-width : 1261px) {
+                .toast {
+                    width: 100%;
+                    border-radius: 0; 
+                }
+            }
+
+            @media only screen and (min-width : 601px) and (max-width : 1260px) {
+                #toast-container {
+                    min-width: 100%;
+                    bottom: 0%;
+                    top: 90%;
+                    right: 0%;
+                    left: 0%;
+                } 
+            }
+
+            @media only screen and (min-width : 1261px) {
+                #toast-container {
+                    min-width: 100%;
+                    bottom: 0%;
+                    top: 90%;
+                    right: 0%;
+                    left: 0%; 
+                } 
             }
         </style>
     </head>
+    
     <body>
-        <div class="row">
-            <div class="top-bar">
-                <div class="top-bar-left">
-                    <ul class="dropdown menu" data-dropdown-menu>
-                        <li class="menu-text">Da Numba 1 Movie Catalog App</li>
-                        <li <?php isset($controller_name_from_uri) && makeMenuItemActive('movie-listings', $controller_name_from_uri); ?> >
-                            <a href="<?php echo s3MVC_MakeLink("movie-listings"); ?>">
-                                Home
+        
+        <div class="navbar-fixed">
+            
+            <!-- Dropdown Structure -->
+            <ul id="dropdown1" class="dropdown-content">
+                            
+                <li><a href="<?= $controller_object->makeLink("/users"); ?>">Manage Users</a></li>
+                            
+                <li class="divider"></li>
+                
+                <?php if( $controller_object->isLoggedIn() ): ?>
+                        
+                    <li><a href="<?= $controller_object->makeLink("/users/add"); ?>">Add New User</a></li>
+                    
+                <?php endif; // if( $controller_object->isLoggedIn() ) ?>
+            </ul>
+            
+            <nav>
+                <div class="nav-wrapper">
+                    
+                    <a href="<?= $controller_object->makeLink('/movie-listings'); ?>"
+                       class="brand-logo">
+                        Da Numba 1 Movie Catalog App
+                    </a>
+                    
+                    <a href="#" data-target="mobile-demo" class="sidenav-trigger">
+                        <i class="material-icons">menu</i>
+                    </a>
+                    
+                    <ul id="nav-mobile" class="right hide-on-med-and-down">
+                        
+                        <li class="<?= makeMenuItemActive('movie-listings', $controller_object->getControllerNameFromUri()); ?>">
+                            <a href="<?= $controller_object->makeLink('/movie-listings'); ?>">
+                                <?= $__localeObj->gettext('main_template_text_home'); ?>
                             </a>
                         </li>
-                        <li <?php isset($controller_name_from_uri) && makeMenuItemActive('users', $controller_name_from_uri); ?> >
-                            <a href="<?php echo s3MVC_MakeLink("users"); ?>">Manage Users</a>
-                            
-                            <?php if( isset($is_logged_in) && $is_logged_in ): ?>
-                                <ul class="menu vertical">
-                                    <li><a href="<?php echo s3MVC_MakeLink("users/add"); ?>">Add New User</a></li>
-                                </ul>
-                            <?php endif; // if( isset($is_logged_in) && $is_logged_in ) ?>
-                            
+                        
+                        <!-- Dropdown Trigger -->
+                        <li class="<?= makeMenuItemActive('users', $controller_object->getControllerNameFromUri()); ?>">
+                            <a class="dropdown-trigger" 
+                               href="#!" data-target="dropdown1">
+                                Users<i class="material-icons right">arrow_drop_down</i>
+                            </a>
                         </li>
-                    </ul> <!-- <ul class="dropdown menu" data-dropdown-menu> -->
-                </div> <!-- <div class="top-bar-left"> -->
+                        
+                        <?php if($controller_object->isLoggedIn()): ?>
+                            <li>
+                                <a href="<?= $controller_object->makeLink("/{$controller_object->getControllerNameFromUri()}/logout"); ?>">
+                                    <?= $__localeObj->gettext('base_controller_text_logout'); ?>
+                                </a>&nbsp;
+                            </li>
+                        <?php else: ?>
+                            <li>
+                                <a href="<?= $controller_object->makeLink("/{$controller_object->getControllerNameFromUri()}/login"); ?>">
+                                    <?= $__localeObj->gettext('base_controller_text_login'); ?>
+                                </a>&nbsp;
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            </nav>
+            
+        </div> <!-- <div class="navbar-fixed"> -->
+        
+        <ul class="sidenav" id="mobile-demo">
+            <li>
+                <a href="<?= $controller_object->makeLink('/movie-listings'); ?>">
+                    <?= $__localeObj->gettext('main_template_text_home'); ?>
+                </a>
+            </li>
 
-                <div class="top-bar-right">
-                    <ul class="menu">
-                        <li><input type="search" placeholder="Search"></li>
-                        <li><button type="button" class="button">Search</button></li>
-                        <li>&nbsp;</li>
-                        <li>
-                            <?php
-                                if( !isset($controller_name_from_uri) ) {
+            <li><a href="<?= $controller_object->makeLink("/users"); ?>">Manage Users</a></li>
 
-                                    $controller_name_from_uri = 'movie-listings';
-                                }
+            <?php if( $controller_object->isLoggedIn() ): ?>
 
-                                $login_action_path = s3MVC_MakeLink("/{$controller_name_from_uri}/login");
-                                $logout_action_path = s3MVC_MakeLink("/{$controller_name_from_uri}/logout");
-                            ?>
-                            <?php if( isset($is_logged_in) && $is_logged_in ): ?>
+                <li><a href="<?= $controller_object->makeLink("/users/add"); ?>">Add New User</a></li>
 
-                                <a class="button" href="<?php echo $logout_action_path; ?>">
-                                    <strong>Log Out</strong>
-                                </a>
+            <?php endif; // if( $controller_object->isLoggedIn() ) ?>
 
-                            <?php else: ?>
-
-                                <a class="button" href="<?php echo $login_action_path; ?>">
-                                    <strong>Log in</strong>
-                                </a>
-
-                            <?php endif; ?>
-                        </li>
-                    </ul> <!-- <ul class="menu"> -->
-                </div> <!-- <div class="top-bar-right"> -->
-            </div> <!-- <div class="top-bar"> -->
-        </div> <!-- <div class="row"> -->
-
-        <?php if( isset($last_flash_message) && $last_flash_message !== null  ): ?>
-
-            <?php $last_flash_message_css_class = isset($last_flash_message_css_class)? $last_flash_message_css_class : ''; ?>
+            <?php if($controller_object->isLoggedIn()): ?>
+                <li>
+                    <a href="<?= $controller_object->makeLink("/{$controller_object->getControllerNameFromUri()}/logout"); ?>">
+                        <?= $__localeObj->gettext('base_controller_text_logout'); ?>
+                    </a>&nbsp;
+                </li>
+            <?php else: ?>
+                <li>
+                    <a href="<?= $controller_object->makeLink("/{$controller_object->getControllerNameFromUri()}/login"); ?>">
+                        <?= $__localeObj->gettext('base_controller_text_login'); ?>
+                    </a>&nbsp;
+                </li>
+            <?php endif; ?>
+                
+        </ul> <!-- <ul class="sidenav" id="mobile-demo"> -->
+        
+        <div class="container">
 
             <div class="row" style="margin-top: 1em;">
-                <div class="callout <?php echo $last_flash_message_css_class; echo is_array($last_flash_message)? '' : ' text-center'; ?>"  data-closable>
-                    <button class="close-button" data-close>&times;</button>
-                    <p>
-                        <?php if( is_array($last_flash_message) ): ?>
-                            
-                            <ul>
-                            <?php foreach($last_flash_message as $curr_flash_msg): ?>
-                        
-                                <li><?php echo $curr_flash_msg; ?></li>
-                        
-                            <?php endforeach; // foreach($last_flash_message as $curr_flash_msg): ?>
-                            </ul>
-                        <?php else: ?>
-                            <?php echo $last_flash_message; ?>
-                        <?php endif; // if( is_array($last_flash_message) ): ?>
-                    </p>
-                </div> <!-- <div class="callout <?php echo $last_flash_message_css_class; echo is_array($last_flash_message)? '' : ' text-center'; ?>"  data-closable> -->
-            </div> <!-- <div class="row" style="margin-top: 1em;"> -->
+                <div class="s12">
+                    <?php if( $controller_object->isLoggedIn() ): ?>
 
-        <?php endif; //if( $last_flash_message !== null )?>
+                        <strong style="color: #7f8fa4;">
+                            Logged in as <?= $controller_object->getVespulaAuthObject()->getUsername(); ?>
+                        </strong>
 
-        <div class="row" style="margin-top: 1em;">
-            <div class="small-12 columns">
-                <?php if( isset($is_logged_in) && $is_logged_in ): ?>
-
-                    <strong style="color: #7f8fa4;">
-                        Logged in as <?php echo isset($logged_in_users_username) ? $logged_in_users_username : ''; ?>
-                    </strong>
-
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <div class="row" style="margin-top: 1em;">
-            <div class="small-12 columns">
-                <?php echo $content; ?>
-            </div>
-        </div>
-
-        <footer class="row">
-            <div class="small-12 columns">
-                <hr/>
-                <div class="row">
-                    <div class="small-6 columns">
-                        <p>Copyright &copy; <?php echo date('Y'); ?>. Da Numba 1 Movie Catalog App.</p>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
-        </footer>
 
-        <script src="<?php echo s3MVC_MakeLink('/js/foundation/vendor/what-input.js'); ?>"></script>
-        <script src="<?php echo s3MVC_MakeLink('/js/foundation/vendor/foundation.min.js'); ?>"></script>
-        <script> $(document).foundation(); </script>
+            <div class="row" style="margin-top: 1em;">
+                <div class="s12">
+                    <?php echo $content; ?>
+                </div>
+            </div>
+
+            <div class="s12">
+                <footer>
+                    <hr/>
+                    <p>Copyright &copy; <?php echo date('Y'); ?>. Da Numba 1 Movie Catalog App.</p>
+                </footer>
+            </div>
+            
+        </div>
+
+        <!--JavaScript at end of body for optimized loading-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                
+                var elems = document.querySelectorAll('.dropdown-trigger');
+                var instances = M.Dropdown.init(elems, { hover: false });
+
+                var sideNavElems = document.querySelectorAll('.sidenav');
+                var sideNavInstances = M.Sidenav.init(sideNavElems, {});
+                
+                // Flash Message display logic
+                <?php if( isset($last_flash_message) && $last_flash_message !== null  ): ?>
+
+                    var flash_toast_css = '<?= $this->escapeJs($last_flash_message_css_class ?? ''); ?>';
+                    var flash_toast_messages = '';
+
+                    <?php if( is_array($last_flash_message) ): ?>
+
+                        <?php foreach($last_flash_message as $curr_flash_msg): ?>
+
+                            flash_toast_messages += '<?= $this->escapeJs($curr_flash_msg); ?><br>';
+
+                        <?php endforeach; // foreach($last_flash_message as $curr_flash_msg): ?>
+
+                    <?php else: ?>
+
+                        flash_toast_messages += '<?= $this->escapeJs($last_flash_message); ?><br>';
+
+                    <?php endif; // if( is_array($last_flash_message) ): ?>
+                        
+                    M.toast({html: flash_toast_messages, displayLength: 15000, classes: flash_toast_css });
+
+                <?php endif; //if( $last_flash_message !== null )?>
+            });
+        </script>
+        
     </body>
 </html>
-
-<?php
-function makeMenuItemActive($links_controller_name, $controller_name_from_uri) {
-
-    if( trim($controller_name_from_uri) === trim($links_controller_name) ) {
-
-        echo 'class="active-link"';
-
-    } else { echo ''; }
-}

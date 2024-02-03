@@ -1,18 +1,30 @@
 {
-    "name": "rotexsoft/movie-web-app",
-    "description": "Simple Movie Catalog Web App built using Slim MVC.",
+    "name": "package/name",
+    "description": "Description of your web app goes here.",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.4",
-        "rotexsoft/slim-skeleton-mvc-tools": "3.0.*",
-        "slim/flash": "^0.2.0",
-        "rotexsoft/leanorm": "^1.1.1-RC2"
-    },
-    "require-dev": {
-        
+        "php": ">=7.4.0",
+        "rotexsoft/slim-skeleton-mvc-tools": "^4.2.1",
+        "slim/flash": "^0.4.0",
+        "rotexsoft/leanorm": "^3.0"
     },
     "autoload": {
         "classmap": [ "src/", "tests/", "vendor/slim/" ]
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@php -r \"file_exists('./public/.htaccess') || copy('./public/.htaccess.dist', './public/.htaccess');\"",
+            "@php -r \"file_exists('./config/env.php') || copy('./config/env-dist.php', './config/env.php');\"",
+            "@php -r \"file_exists('./config/app-settings.php') || copy('./config/app-settings-dist.php', './config/app-settings.php');\""
+        ],
+        "post-update-cmd": [
+            "@php -r \"file_exists('./public/.htaccess') || copy('./public/.htaccess.dist', './public/.htaccess');\"",
+            "@php -r \"file_exists('./config/env.php') || copy('./config/env-dist.php', './config/env.php');\"",
+            "@php -r \"file_exists('./config/app-settings.php') || copy('./config/app-settings-dist.php', './config/app-settings.php');\""
+        ]
+    },
+    "require-dev": {
+        "rotexsoft/leanorm-cli": "^1.0"
     }
 }
