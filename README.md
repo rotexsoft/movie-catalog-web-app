@@ -38,5 +38,12 @@ Browse to http://localhost:8888/users to initiate the admin user
 
 No browse to http://localhost:8888/movie-listings to start adding movies
 
+To view all the MVC routes available in this application, there's an action 
+automatically avalaible in all controllers that extend 
+**\SlimMvcTools\Controllers\BaseController** in any app built using the 
+[SlimPHP 4 Skeleton MVC App Framework](https://github.com/rotexsoft/slim-skeleton-mvc-app). 
+
+The MVC routes url for this application is http://localhost:8888/movie-catalog-base/routes 
+
 Enjoy!
 
