@@ -1,5 +1,5 @@
 {
-    "name": "rotexsoft/movie-catalog-demo-for-rotexsoft-slim-skeleton-mvc-app",
+    "name": "rotexsoft/movie-catalog-web-app",
     "description": "A Movie Catalog Web App built with the SlimPHP 4 Skeleton MVC App Framework (https://github.com/rotexsoft/slim-skeleton-mvc-app) ",
     "minimum-stability": "dev",
     "prefer-stable": true,
