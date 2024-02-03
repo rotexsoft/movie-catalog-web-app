@@ -1,6 +1,6 @@
 {
-    "name": "package/name",
-    "description": "Description of your web app goes here.",
+    "name": "rotexsoft/movie-catalog-demo-for-rotexsoft-slim-skeleton-mvc-app",
+    "description": "A Movie Catalog Web App built with the SlimPHP 4 Skeleton MVC App Framework (https://github.com/rotexsoft/slim-skeleton-mvc-app) ",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
@@ -8,6 +8,9 @@
         "rotexsoft/slim-skeleton-mvc-tools": "^4.2.1",
         "slim/flash": "^0.4.0",
         "rotexsoft/leanorm": "^3.0"
+    },
+    "require-dev": {
+        "rotexsoft/leanorm-cli": "^1.0"
     },
     "autoload": {
         "classmap": [ "src/", "tests/", "vendor/slim/" ]
@@ -23,8 +26,5 @@
             "@php -r \"file_exists('./config/env.php') || copy('./config/env-dist.php', './config/env.php');\"",
             "@php -r \"file_exists('./config/app-settings.php') || copy('./config/app-settings-dist.php', './config/app-settings.php');\""
         ]
-    },
-    "require-dev": {
-        "rotexsoft/leanorm-cli": "^1.0"
     }
 }
