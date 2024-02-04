@@ -36,7 +36,7 @@ php -S 0.0.0.0:8888 -t public
 
 Browse to http://localhost:8888/users to initiate the admin user
 
-No browse to http://localhost:8888/movie-listings to start adding movies
+Now browse to http://localhost:8888/movie-listings to start adding movies
 
 To view all the MVC routes available in this application, there's an action 
 automatically avalaible in all controllers that extend 
