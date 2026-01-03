@@ -51,10 +51,9 @@
                 return false;
             }
 
-            // Change /users/init-users to use HTTP POST for initializing the admin user
-            // so we don't have to put the entered password in the url, it should be
-            // instead sent via POST so it doesn't get logged in the webserver's 
-            // access log file
+            // TODO: Change /users/init-users to use HTTP POST for initializing the admin
+            // user so we don't have to put the entered password in the url, it should be
+            // instead sent via POST so it doesn't get logged in the webserver's access log file
             window.location.href = 
                 '<?= $controller_object->makeLink("/users/init-users"); ?>' + '/' + entered_password;
         });
