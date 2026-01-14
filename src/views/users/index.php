@@ -33,7 +33,7 @@
 
     <p>
         No user(s) exist. <br>
-        Initialize the system with an <strong>admin</strong> user with a password of: 
+        Initialize the system with an <span style="font-weight: bold;">admin</span> user with a password of: 
         <input id="initialize-password" type="password" style="width: 25%; display:inline;">.
         <input id="initialize-button" type="submit" value="Initialize">
     </p>
