@@ -7,7 +7,8 @@
         "php": ">=7.4.0",
         "rotexsoft/slim-skeleton-mvc-tools": "^4.2.1",
         "slim/flash": "^0.4.0",
-        "rotexsoft/leanorm": "^3.0"
+        "rotexsoft/leanorm": "^3.0",
+        "vespula/auth": "2.2.*"
     },
     "require-dev": {
         "rotexsoft/leanorm-cli": "^1.0"
