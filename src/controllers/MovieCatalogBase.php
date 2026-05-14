@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace MovieCatalog\Controllers;
 
 use \Psr\Container\ContainerInterface;
@@ -6,7 +8,9 @@ use \Psr\Http\Message\ResponseInterface;
 use \Psr\Http\Message\ServerRequestInterface;
 
 /**
+ * 
  * Description of MovieCatalogBase goes here
+ * 
  */
 class MovieCatalogBase extends \SlimMvcTools\Controllers\BaseController
 {   
@@ -38,60 +42,7 @@ class MovieCatalogBase extends \SlimMvcTools\Controllers\BaseController
         parent::__construct($container, $controller_name_from_uri, $action_name_from_uri, $req, $res);
     }
     
-    protected function doDelete($id, $model_key_name_in_container) {
-
-        // The call below is to get a response object for
-        // redirecting the user to the login page if the
-        // user is not currently logged in. You must be 
-        // logged in in order to be able to delete an 
-        // existing record. If the user is logged in, 
-        // $login_response will receive a value of 
-        // false from $this->getResponseObjForLoginRedirectionIfNotLoggedIn().
-        $login_response = $this->getResponseObjForLoginRedirectionIfNotLoggedIn();
-        
-        if( $login_response instanceof \Psr\Http\Message\ResponseInterface ) {
-            
-            // redirect to login page
-            return $login_response;
-        }
-
-        // get model object
-        $model_obj = $this->getContainerItem($model_key_name_in_container);
-        
-        // fetch the record
-        $record = $model_obj->fetchOneByPkey($id);
-        
-        if( !($record instanceof \MovieCatalog\Models\Records\BaseRecord) ) {
-            
-            // Could not find record with the specified $id
-            $this->forceHttp404(
-                'Requested item could not be deleted. It does not exist.'
-            );
-        }
-        
-        // We will be redirecting to the default action of the current 
-        // controller
-        $rdr_path = $this->makeLink("{$this->controller_name_from_uri}");
-        
-        if ( $record->delete() === false ) {
-            
-            // Delete operation was not successful. Set error message.
-            $this->setErrorFlashMessage('Could not Delete Record!');
-            
-        } else {
-            
-            // Delete operation was successful. Set success message.
-            $this->setSuccessFlashMessage('Successfully Deleted!');
-        }
-        
-        // Redirect to the default action of the current controller
-        return $this->response->withStatus(302)->withHeader('Location', $rdr_path);
-    }
-    
-    /**
-     * @return \Psr\Http\Message\ResponseInterface|string
-     */
-    public function actionIndex() {
+    public function actionIndex(): ResponseInterface|string  {
         
         //get the contents of the view first
         $view_str = $this->renderView('index.php', ['controller_object'=>$this]);
@@ -142,7 +93,7 @@ class MovieCatalogBase extends \SlimMvcTools\Controllers\BaseController
     protected function setErrorFlashMessage($msg) {
         
         $this->setFlashMessage($msg);
-        $this->setFlashMessageCssClass('red');
+        $this->setFlashMessageCssClass('red darken-4');
     }
 
     protected function setSuccessFlashMessage($msg) {
@@ -191,5 +142,55 @@ class MovieCatalogBase extends \SlimMvcTools\Controllers\BaseController
             $messages = array_pop($messages);
         }
         return $messages;
+    }
+    
+    protected function doDelete($id, $model_key_name_in_container) {
+
+        // The call below is to get a response object for
+        // redirecting the user to the login page if the
+        // user is not currently logged in. You must be 
+        // logged in in order to be able to delete an 
+        // existing record. If the user is logged in, 
+        // $login_response will receive a value of 
+        // false from $this->getResponseObjForLoginRedirectionIfNotLoggedIn().
+        $login_response = $this->getResponseObjForLoginRedirectionIfNotLoggedIn();
+        
+        if( $login_response instanceof \Psr\Http\Message\ResponseInterface ) {
+            
+            // redirect to login page
+            return $login_response;
+        }
+
+        // get model object
+        $model_obj = $this->getContainerItem($model_key_name_in_container);
+        
+        // fetch the record
+        $record = $model_obj->fetchOneByPkey($id);
+        
+        if( !($record instanceof \MovieCatalog\Models\Records\BaseRecord) ) {
+            
+            // Could not find record with the specified $id
+            $this->forceHttp404(
+                'Requested item could not be deleted. It does not exist.'
+            );
+        }
+        
+        // We will be redirecting to the default action of the current 
+        // controller
+        $rdr_path = $this->makeLink("{$this->controller_name_from_uri}");
+        
+        if ( $record->delete() === false ) {
+            
+            // Delete operation was not successful. Set error message.
+            $this->setErrorFlashMessage('Could not Delete Record!');
+            
+        } else {
+            
+            // Delete operation was successful. Set success message.
+            $this->setSuccessFlashMessage('Successfully Deleted!');
+        }
+        
+        // Redirect to the default action of the current controller
+        return $this->response->withStatus(302)->withHeader('Location', $rdr_path);
     }
 }

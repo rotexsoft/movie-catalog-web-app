@@ -41,5 +41,5 @@
         | <a href="<?= $controller_object->makeLink( "movie-listings/edit/" . $movie_record->id ); ?>">Edit</a> |
         <a href="<?= $controller_object->makeLink( "movie-listings/delete/" . $movie_record->id ); ?>">Delete</a>
 
-    <?php endif; //if( $controller_object->isLoggedIn() )  ?>
+    <?php endif;  ?>
 </p>

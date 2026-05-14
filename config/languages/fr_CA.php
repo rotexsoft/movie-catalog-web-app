@@ -24,6 +24,7 @@ return [
     'base_controller_text_french' => 'Français',
     
     'main_template_text_home' => "Maison",
+    'main_template_text_all_mvc_routes' => "Toutes les routes MVC",
     'main_template_text_copyright_footer' => "Copyright personne du tout. Aller en ville.",
     'main_template_text_header_1' => "Bienvenue sur votre nouveau site",
     'main_template_text_tagline_p_start' => "Ce site est alimenté par",
@@ -32,4 +33,35 @@ return [
     'default_application_error_title_text' => "Erreur de l'application SlimPHP 4 Skeleton MVC",
     'default_application_error_title_description' => "Une erreur du site Web s'est produite. Désolé pour le désagrément temporaire.",
     'default_application_error_title_detailed_description' => "L'application n'a pas pu s'exécuter en raison de l'erreur suivante",
+    
+    'error_layout_not_found' => "Mise en page pour la ressource demandée introuvable",
+    'error_view_not_found' => "La ressource demandée est introuvable",
+    
+    \Slim\Exception\HttpBadRequestException::class . '_title' => "400 Mauvaise demande",
+    \Slim\Exception\HttpForbiddenException::class . '_title'  => "403 Interdit",
+    \Slim\Exception\HttpGoneException::class . '_title' => "410 Gone",
+    \Slim\Exception\HttpInternalServerErrorException::class . '_title' => "500 Erreur de serveur interne",
+    \Slim\Exception\HttpMethodNotAllowedException::class . '_title' => "405 Méthode non autorisée",
+    \Slim\Exception\HttpNotFoundException::class . '_title' => "404 Non trouvé",
+    \Slim\Exception\HttpNotImplementedException::class . '_title' => "501 Non mis en œuvre",
+    \Slim\Exception\HttpTooManyRequestsException::class . '_title' => "429 Trop de demandes",
+    \Slim\Exception\HttpUnauthorizedException::class . '_title' => "401 Non autorisé",
+    
+    \Slim\Exception\HttpBadRequestException::class . '_description' => "Le serveur ne peut pas ou ne veut pas traiter la demande en raison d'une erreur client apparente.",
+    \Slim\Exception\HttpForbiddenException::class . '_description'  => "Vous n'êtes pas autorisé à effectuer l'opération demandée.",
+    \Slim\Exception\HttpGoneException::class . '_description' => "La ressource cible n'est plus disponible sur le serveur d'origine.",
+    \Slim\Exception\HttpInternalServerErrorException::class . '_description' => "Une condition inattendue s'est produite empêchant le serveur de répondre à la demande.",
+    \Slim\Exception\HttpMethodNotAllowedException::class . '_description' => "La méthode de requête n'est pas prise en charge pour la ressource demandée.",
+    \Slim\Exception\HttpNotFoundException::class . '_description' => "La ressource demandée est introuvable. Veuillez vérifier l'URI et réessayer.",
+    \Slim\Exception\HttpNotImplementedException::class . '_description' => "Le serveur ne prend pas en charge les fonctionnalités requises pour répondre à la demande.",
+    \Slim\Exception\HttpTooManyRequestsException::class . '_description' => "L'application client a dépassé sa limite de débit, ou le nombre de requêtes qu'elle peut envoyer au cours d'une période de temps donnée.",
+    \Slim\Exception\HttpUnauthorizedException::class . '_description' => "La demande nécessite une authentification utilisateur valide.",
+    
+    'html_error_renderer_text_details' => 'Détails',
+    'html_error_renderer_text_type' => 'Type',
+    'html_error_renderer_text_code' => 'Code',
+    'html_error_renderer_text_mssg' => 'Message',
+    'html_error_renderer_text_file' => 'Fichier',
+    'html_error_renderer_text_line' => 'Ligne',
+    'html_error_renderer_text_trace' => 'Tracé',
 ];

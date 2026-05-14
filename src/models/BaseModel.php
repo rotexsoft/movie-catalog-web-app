@@ -14,6 +14,5 @@ class BaseModel extends \LeanOrm\Model {
         string $table_name = ''
     ) {
         parent::__construct($dsn, $username, $passwd, $pdo_driver_opts, $primary_col_name, $table_name);
-        
     }
 }

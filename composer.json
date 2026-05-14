@@ -4,28 +4,30 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.4.0",
-        "rotexsoft/slim-skeleton-mvc-tools": "^4.2.1",
+        "php": ">=8.2.0",
+        "rotexsoft/slim-skeleton-mvc-tools": "7.2.*",
         "slim/flash": "^0.4.0",
-        "rotexsoft/leanorm": "^3.0",
-        "vespula/auth": "2.2.*"
+        "rotexsoft/leanorm": "^6.0"
     },
     "require-dev": {
-        "rotexsoft/leanorm-cli": "^1.0"
+        "rotexsoft/leanorm-cli": "^4.0"
     },
     "autoload": {
         "classmap": [ "src/", "tests/", "vendor/slim/" ]
     },
     "scripts": {
-        "post-install-cmd": [
+        "generate-framework-files": [
+            "@php -r \" echo 'Generating framework files...' . PHP_EOL; \"",
             "@php -r \"file_exists('./public/.htaccess') || copy('./public/.htaccess.dist', './public/.htaccess');\"",
             "@php -r \"file_exists('./config/env.php') || copy('./config/env-dist.php', './config/env.php');\"",
-            "@php -r \"file_exists('./config/app-settings.php') || copy('./config/app-settings-dist.php', './config/app-settings.php');\""
+            "@php -r \"file_exists('./config/app-settings.php') || copy('./config/app-settings-dist.php', './config/app-settings.php');\"",
+            "@php -r \"file_exists('./leanorm-cli-config.php') || copy('./leanorm-cli-config-dist.php', './leanorm-cli-config.php');\""
+        ],
+        "post-install-cmd": [
+            "@composer generate-framework-files"
         ],
         "post-update-cmd": [
-            "@php -r \"file_exists('./public/.htaccess') || copy('./public/.htaccess.dist', './public/.htaccess');\"",
-            "@php -r \"file_exists('./config/env.php') || copy('./config/env-dist.php', './config/env.php');\"",
-            "@php -r \"file_exists('./config/app-settings.php') || copy('./config/app-settings-dist.php', './config/app-settings.php');\""
+            "@composer generate-framework-files"
         ]
     }
 }

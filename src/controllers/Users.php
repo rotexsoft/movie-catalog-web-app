@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace MovieCatalog\Controllers;
 
 use \Psr\Container\ContainerInterface;
@@ -6,7 +8,9 @@ use \Psr\Http\Message\ResponseInterface;
 use \Psr\Http\Message\ServerRequestInterface;
 
 /**
+ * 
  * Description of Users goes here
+ * 
  */
 class Users extends \MovieCatalog\Controllers\MovieCatalogBase
 {   
@@ -38,15 +42,10 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
         parent::__construct($container, $controller_name_from_uri, $action_name_from_uri, $req, $res);
     }
     
-    /**
-     * @return \Psr\Http\Message\ResponseInterface|string
-     */
-    public function actionIndex() {
+    public function actionIndex(): ResponseInterface|string {
         
         $view_data = [];
-        $model_class = 
-            \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class;
-        
+        $model_class = \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class;
         $model_obj = $this->getContainerItem($model_class);
         
         // Grab all existing user records.
@@ -61,7 +60,7 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
-    public function actionAdd() {
+    public function actionAdd(): ResponseInterface|string {
         
         // The call below is to get a response object for
         // redirecting the user to the login page if the
@@ -80,7 +79,6 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
         
         $model_class = 
             \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class;
-        /** @var \MovieCatalog\Models\BaseModel $model_obj */
         $model_obj = $this->getContainerItem($model_class);
         $error_msgs = [];
         $error_msgs['form-errors'] = [];
@@ -177,7 +175,7 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
         return $this->renderLayout($this->layout_template_file_name, ['content'=>$view_str]);
     }
     
-    public function actionEdit($id) {
+    public function actionEdit(string|int $id): ResponseInterface|string {
         
         // The call below is to get a response object for
         // redirecting the user to the login page if the
@@ -196,7 +194,6 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
         
         $model_class = 
             \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class;
-        /** @var \MovieCatalog\Models\BaseModel $model_obj */
         $model_obj = $this->getContainerItem($model_class);
         $error_msgs = [];
         $error_msgs['form-errors'] = [];
@@ -289,15 +286,7 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
         return $this->renderLayout('main-template.php', ['content'=>$view_str]);
     }
     
-    public function actionDelete($id) {
-        
-        return $this->doDelete(
-            $id, 
-            \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class
-        );
-    }
-    
-    public function actionView($id) {
+    public function actionView(string|int $id): ResponseInterface|string {
         
         $view_data = [];
         $model_class = 
@@ -323,7 +312,15 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
         return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
     }
     
-    public function actionInitUsers($password) {
+    public function actionDelete(string|int $id): ResponseInterface|string {
+        
+        return $this->doDelete(
+            $id, 
+            \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class
+        );
+    }
+    
+    public function actionInitUsers(string $password): ResponseInterface|string {
         
         $view_str = ''; // will hold output to be injected into the site layout 
                         // file (i.e. `./src/layout-templates/main-template.php`)
@@ -347,7 +344,7 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
             // the new record is saved.
             $user_data = [
                 'username' => 'admin', 
-                'password' => password_hash($password , PASSWORD_DEFAULT)
+                'password' => \password_hash($password , PASSWORD_DEFAULT)
             ];
             $user_record = $model_obj->createNewRecord($user_data);
             

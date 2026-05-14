@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace MovieCatalog\Controllers;
 
 use \Psr\Container\ContainerInterface;
@@ -40,77 +42,7 @@ class MovieListings extends \MovieCatalog\Controllers\MovieCatalogBase
         parent::__construct($container, $controller_name_from_uri, $action_name_from_uri, $req, $res);
     }
     
-    public function actionIndex() {
-        
-        $view_data = [];
-        /** @var \MovieCatalog\Models\MoviesListings\MoviesListingsModel $model_obj */
-        $model_obj = $this->getContainerItem(
-            \MovieCatalog\Models\MoviesListings\MoviesListingsModel::class
-        );
-        
-        // Grab all existing movie records.
-        // Note that the variable $collection_of_movie_records will be available
-        // in your index.php view (in this case ./src/views/movie-listings/index.php)
-        // when $this->renderView('index.php', $view_data) is called.
-        $view_data['collection_of_movie_records'] = 
-                                    $model_obj->fetchRecordsIntoCollection();
-        
-        $response_format = sMVC_GetSuperGlobal('get', 'format', null);
-        
-        if( 
-            $response_format !== null
-            && !in_array( trim(mb_strtolower( ''.$response_format, 'UTF-8')), ['html', 'xhtml'] )
-        ) {
-            //handle other specified formats (non-html)
-            if ( trim(mb_strtolower(''.$response_format, 'UTF-8')) === 'json' ) {
-                
-                // return response in json format
-                $movie_listings_array = [];
-                
-                if( 
-                    $view_data['collection_of_movie_records'] instanceof \MovieCatalog\Models\Collections\BaseCollection 
-                    && count($view_data['collection_of_movie_records']) > 0 
-                ) {
-                    //convert collection of movie_listings records to an array of arrays
-                    foreach ($view_data['collection_of_movie_records'] as $record) {
-
-                        // $record->getData() gets the underlying associative array 
-                        // containing a record's data
-                        $movie_listings_array[] = $record->getData();
-                    }
-                }
-                
-                $this->response
-                     ->getBody()
-                     ->write($json = json_encode($movie_listings_array));
-
-                // Ensure that the json encoding passed successfully
-                if ($json === false) {
-                    
-                    throw new \RuntimeException(json_last_error_msg(), json_last_error());
-                }
-                
-                return $this->response
-                            ->withStatus(302)
-                            ->withHeader('Content-Type', 'application/json;charset=utf-8');
-                
-            } else {
-                
-                // Unknown format specified, generate an error page
-                $msg = "Unknown format `$response_format` specified";
-                $this->forceHttp404($msg);
-            }
-            
-        } else {
-        
-            //render the view first and capture the output
-            $view_str = $this->renderView('index.php', $view_data);
-
-            return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
-        }
-    }
-    
-    public function actionAdd() {
+    public function actionAdd(): ResponseInterface|string {
         
         // The call below is to get a response object for
         // redirecting the user to the login page if the
@@ -210,7 +142,7 @@ class MovieListings extends \MovieCatalog\Controllers\MovieCatalogBase
         return $this->renderLayout('main-template.php', ['content'=>$view_str]);
     }
     
-    public function actionEdit($id) {
+    public function actionEdit(string|int $id): ResponseInterface|string {
         
         // The call below is to get a response object for
         // redirecting the user to the login page if the
@@ -302,7 +234,7 @@ class MovieListings extends \MovieCatalog\Controllers\MovieCatalogBase
         return $this->renderLayout('main-template.php', ['content'=>$view_str]);
     }
     
-    public function actionDelete($id) {
+    public function actionDelete(string|int $id): ResponseInterface|string {
         
         return $this->doDelete(
             $id,
@@ -310,7 +242,77 @@ class MovieListings extends \MovieCatalog\Controllers\MovieCatalogBase
         );
     }
     
-    public function actionView($id) {
+    public function actionIndex(): ResponseInterface|string {
+        
+        $view_data = [];
+        /** @var \MovieCatalog\Models\MoviesListings\MoviesListingsModel $model_obj */
+        $model_obj = $this->getContainerItem(
+            \MovieCatalog\Models\MoviesListings\MoviesListingsModel::class
+        );
+        
+        // Grab all existing movie records.
+        // Note that the variable $collection_of_movie_records will be available
+        // in your index.php view (in this case ./src/views/movie-listings/index.php)
+        // when $this->renderView('index.php', $view_data) is called.
+        $view_data['collection_of_movie_records'] = 
+                                    $model_obj->fetchRecordsIntoCollection();
+        
+        $response_format = sMVC_GetSuperGlobal('get', 'format', null);
+        
+        if( 
+            $response_format !== null
+            && !in_array( trim(mb_strtolower( ''.$response_format, 'UTF-8')), ['html', 'xhtml'] )
+        ) {
+            //handle other specified formats (non-html)
+            if ( trim(mb_strtolower(''.$response_format, 'UTF-8')) === 'json' ) {
+                
+                // return response in json format
+                $movie_listings_array = [];
+                
+                if( 
+                    $view_data['collection_of_movie_records'] instanceof \MovieCatalog\Models\Collections\BaseCollection 
+                    && count($view_data['collection_of_movie_records']) > 0 
+                ) {
+                    //convert collection of movie_listings records to an array of arrays
+                    foreach ($view_data['collection_of_movie_records'] as $record) {
+
+                        // $record->getData() gets the underlying associative array 
+                        // containing a record's data
+                        $movie_listings_array[] = $record->getData();
+                    }
+                }
+                
+                $this->response
+                     ->getBody()
+                     ->write($json = json_encode($movie_listings_array));
+
+                // Ensure that the json encoding passed successfully
+                if ($json === false) {
+                    
+                    throw new \RuntimeException(json_last_error_msg(), json_last_error());
+                }
+                
+                return $this->response
+                            ->withStatus(302)
+                            ->withHeader('Content-Type', 'application/json;charset=utf-8');
+                
+            } else {
+                
+                // Unknown format specified, generate an error page
+                $msg = "Unknown format `$response_format` specified";
+                $this->forceHttp400($msg); // bad request
+            }
+            
+        } else {
+        
+            //render the view first and capture the output
+            $view_str = $this->renderView('index.php', $view_data);
+
+            return $this->renderLayout( $this->layout_template_file_name, ['content'=>$view_str] );
+        }
+    }
+    
+    public function actionView(string|int $id): ResponseInterface|string {
         
         $view_data = [];
         /** @var \MovieCatalog\Models\MoviesListings\MoviesListingsModel $model_obj */

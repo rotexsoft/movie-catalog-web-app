@@ -5,15 +5,19 @@
     $prepend_action = !SMVC_APP_AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES;
 
     $action = ($prepend_action) ? 'action-login' : 'login';
-    $login_path = $sMVC_MakeLink("/{$controller_object->getControllerNameFromUri()}/$action");
+    $login_path = $controller_object->makeLink("/{$controller_object->getControllerNameFromUri()}/$action");
     
     $action1 = ($prepend_action) ? 'action-logout' : 'logout';
-    $logout_action_path = $sMVC_MakeLink("/{$controller_object->getControllerNameFromUri()}/$action1/0");
+    $logout_action_path = $controller_object->makeLink("/{$controller_object->getControllerNameFromUri()}/$action1/0");
 ?>
 
 <?php if( !empty($error_message) ): ?>
 
-    <p style="background-color: orange;"><?php echo $error_message;  ?></p>
+    <div class="card-panel red darken-3" 
+         style="margin-bottom: 2em;"
+         id="login-form-errors">
+        <?php echo $error_message;  ?>
+    </div>
     
 <?php endif; ?>
 
@@ -32,7 +36,7 @@
         </div>
         <br>
         <div>
-            <input type="submit" value="<?= $this->escapeHtmlAttr( $__localeObj->gettext('base_controller_text_login') ); ?>">
+            <input type="submit" class="btn" value="<?= $this->escapeHtmlAttr( $__localeObj->gettext('base_controller_text_login') ); ?>">
         </div>
 
     </form>
@@ -41,7 +45,7 @@
     
     <form action="<?php echo $logout_action_path; ?>" method="post">
         
-      <input type="submit" value="<?= $this->escapeHtmlAttr( $__localeObj->gettext('base_controller_text_logout') ); ?>">
+      <input type="submit" class="btn" value="<?= $this->escapeHtmlAttr( $__localeObj->gettext('base_controller_text_logout') ); ?>">
       
     </form>
     

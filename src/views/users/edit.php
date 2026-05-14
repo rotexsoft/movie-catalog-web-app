@@ -47,22 +47,23 @@
                    maxlength="255"
                    value=""
             >
+            <small style="color: red;">Leave blank to preserve existing password</small>
             <?php printErrorMsg('password', $error_msgs); //print error message(s) if any ?>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col s3">
+    <div class="row center-align">
+        <div class="col s12">
             <input type="submit" 
                    name="save-button" 
                    id="save-button" 
-                   class="button" 
+                   class="button btn" 
                    value="Save"
             >
             <input type="submit" 
                    name="cancel-button" 
                    id="cancel-button" 
-                   class="button" 
+                   class="button btn" 
                    value="Cancel"
             >
         </div>
