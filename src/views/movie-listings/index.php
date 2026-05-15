@@ -21,10 +21,10 @@
 
 <?php if( $collection_of_movie_records instanceof BaseCollection && count($collection_of_movie_records) > 0 ): ?>
 
-    <ul>
+    <ul class="collection with-header">
     <?php foreach ($collection_of_movie_records as $movie_record): ?>
 
-        <li>
+        <li class="collection-item">
             <?php echo $movie_record->title; ?> | 
             <a href="<?php echo $controller_object->makeLink( "movie-listings/view/" . $movie_record->id ); ?>">View</a> 
 

@@ -37,6 +37,10 @@
                 width: 98%;
             }
             
+            strong {
+                font-weight: bold;
+            }
+            
             @media only screen and (min-width : 601px) and (max-width : 1260px) {
                 .toast {
                     width: 100%;

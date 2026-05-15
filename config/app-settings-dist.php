@@ -50,7 +50,7 @@ return [
     AppSettingsKeys::USE_MVC_ROUTES => true,
     AppSettingsKeys::MVC_ROUTES_HTTP_METHODS => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     AppSettingsKeys::AUTO_PREPEND_ACTION_TO_ACTION_METHOD_NAMES => true,
-    AppSettingsKeys::DEFAULT_CONTROLLER_CLASS_NAME => \SlimMvcTools\Controllers\BaseController::class,
+    AppSettingsKeys::DEFAULT_CONTROLLER_CLASS_NAME => \MovieCatalog\Controllers\MovieListings::class,
     AppSettingsKeys::DEFAULT_ACTION_NAME => 'actionIndex',
     
     AppSettingsKeys::ERROR_HANDLER_CLASS => \SlimSkeletonMvcApp\AppErrorHandler::class,
