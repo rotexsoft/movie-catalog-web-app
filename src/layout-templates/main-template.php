@@ -197,7 +197,7 @@
             <div class="s12">
                 <footer>
                     <hr/>
-                    <p>Copyright &copy; <?php echo date('Y'); ?>. Movie Catalog Web-app.</p>
+                    <p style="color: #7f8fa4;">Copyright &copy; <?php echo date('Y'); ?>. Movie Catalog Web-app.</p>
                 </footer>
             </div>
             
