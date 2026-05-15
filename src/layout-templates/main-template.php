@@ -194,7 +194,7 @@
                 </div>
             </div>
 
-            <div class="s12">
+            <div class="s12" style="margin-left: 0.5em; margin-right: 0.5em;">
                 <footer>
                     <hr/>
                     <p style="color: #7f8fa4;">Copyright &copy; <?php echo date('Y'); ?>. Movie Catalog Web-app.</p>
