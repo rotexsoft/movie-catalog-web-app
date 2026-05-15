@@ -4,20 +4,12 @@
     /** @var \SlimMvcTools\Controllers\BaseController $controller_object */
     use \MovieCatalog\Models\Collections\BaseCollection;
 ?>
-<?php if( $controller_object->isLoggedIn() ): ?>
 
     <div class="row" style="margin-top: 1em;">
-        <div class="col s6">
+        <div class="col s12">
             <h4>All Movies</h4>
         </div>
-        <div class="col s6  right-align">
-            <a class="btn" href="<?php echo $controller_object->makeLink( "movie-listings/add" ); ?>">
-                <strong>+ Add new Movie Listing</strong>
-            </a>
-        </div>
     </div>
-
-<?php endif; ?>
 
 <?php if( $collection_of_movie_records instanceof BaseCollection && count($collection_of_movie_records) > 0 ): ?>
 
@@ -46,8 +38,20 @@
 <?php else: ?>
 
 <p>
-    No Movies yet. Please <a href="<?php echo $controller_object->makeLink( "movie-listings/add" ); ?>">Add</a> 
-    one or more movie listing(s).
-</p>
+        No Movies yet. Please <a href="<?php echo $controller_object->makeLink( "movie-listings/add" ); ?>">Add</a> 
+        one or more movie listing(s).
+    </p>
+
+<?php endif; ?>
+
+<?php if( $controller_object->isLoggedIn() ): ?>
+
+    <div class="row" style="margin-top: 1em;">
+        <div class="col s12  right-align">
+            <a class="btn" href="<?php echo $controller_object->makeLink( "movie-listings/add" ); ?>">
+                <strong>+ Add new Movie Listing</strong>
+            </a>
+        </div>
+    </div>
 
 <?php endif; ?>

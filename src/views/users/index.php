@@ -7,10 +7,10 @@
 
 <?php if( $collection_of_user_records instanceof \MovieCatalog\Models\Collections\BaseCollection && count($collection_of_user_records) > 0 ): ?>
 
-    <ul>
+    <ul class="collection">
         <?php foreach ($collection_of_user_records as $user_record): ?>
 
-            <li>
+            <li class="collection-item">
                 <?php echo $user_record->username; ?> | 
                 <a href="<?= $controller_object->makeLink( "users/view/" . $user_record->id ); ?>">View</a> 
 
@@ -58,5 +58,17 @@
                 '<?= $controller_object->makeLink("/users/init-users"); ?>' + '/' + entered_password;
         });
     </script>
+
+<?php endif; ?>
+
+<?php if( $controller_object->isLoggedIn() ): ?>
+
+    <div class="row" style="margin-top: 1em;">
+        <div class="col s12  right-align">
+            <a class="btn" href="<?php echo $controller_object->makeLink( "users/add" ); ?>">
+                <strong>+ Add new User</strong>
+            </a>
+        </div>
+    </div>
 
 <?php endif; ?>

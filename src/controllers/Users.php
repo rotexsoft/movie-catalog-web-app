@@ -44,6 +44,15 @@ class Users extends \MovieCatalog\Controllers\MovieCatalogBase
     
     public function actionIndex(): ResponseInterface|string {
         
+        $responseForLoginRedirect =
+            $this->getResponseObjForLoginRedirectionIfNotLoggedIn();
+        
+        if($responseForLoginRedirect instanceof ResponseInterface) {
+            
+            // not logged in, redirect to login
+            return $responseForLoginRedirect;
+        }
+        
         $view_data = [];
         $model_class = \MovieCatalog\Models\UsersAuthenticationsAccounts\UsersAuthenticationsAccountsModel::class;
         $model_obj = $this->getContainerItem($model_class);

@@ -18,11 +18,11 @@
         <!--Let browser know website is optimized for mobile-->
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         
-        <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="icon" type="image/png" href="<?= $controller_object->makeLink('/favicon-96x96.png'); ?>" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="<?= $controller_object->makeLink('/favicon.svg'); ?>" />
+        <link rel="shortcut icon" href="<?= $controller_object->makeLink('/favicon.ico'); ?>" />
+        <link rel="apple-touch-icon" sizes="180x180" href="<?= $controller_object->makeLink('/apple-touch-icon.png'); ?>" />
+        <link rel="manifest" href="<?= $controller_object->makeLink('/site.webmanifest'); ?>" />
         
         <!--Import Google Icon Font-->
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -30,7 +30,7 @@
         <!--Import materialize.css-->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 
-        <title>Da Numba 1 Movie Catalog App</title>
+        <title>Movie Catalog Web-app</title>
         
         <style>
             .container {
@@ -99,8 +99,9 @@
                 <div class="nav-wrapper">
                     
                     <a href="<?= $controller_object->makeLink('/movie-listings'); ?>"
-                       class="brand-logo">
-                        Da Numba 1 Movie Catalog App
+                       class="brand-logo" style="padding-left: 0.5em;">
+                        <span class="hide-on-small-only">Movie Catalog Web-app</span>
+                        <span class="hide-on-med-and-up">Tha Movies</span>
                     </a>
                     
                     <a href="#" data-target="mobile-demo" class="sidenav-trigger">
@@ -124,13 +125,13 @@
                         </li>
                         
                         <?php if($controller_object->isLoggedIn()): ?>
-                            <li>
+                            <li style="padding-right: 0.5em;">
                                 <a href="<?= $controller_object->makeLink("/{$controller_object->getControllerNameFromUri()}/logout"); ?>">
                                     <?= $__localeObj->gettext('base_controller_text_logout'); ?>
                                 </a>&nbsp;
                             </li>
                         <?php else: ?>
-                            <li>
+                            <li style="padding-right: 0.5em;">
                                 <a href="<?= $controller_object->makeLink("/{$controller_object->getControllerNameFromUri()}/login"); ?>">
                                     <?= $__localeObj->gettext('base_controller_text_login'); ?>
                                 </a>&nbsp;
@@ -175,7 +176,7 @@
         
         <div class="container">
 
-            <div class="row" style="margin-top: 1em;">
+            <div class="row" style="margin-top: 1em; margin-left: 0.5em; margin-right: 0.5em;">
                 <div class="s12">
                     <?php if( $controller_object->isLoggedIn() ): ?>
 
@@ -187,7 +188,7 @@
                 </div>
             </div>
 
-            <div class="row" style="margin-top: 1em;">
+            <div class="row" style="margin-top: 1em; margin-left: 0.75em; margin-right: 0.75em;">
                 <div class="s12">
                     <?php echo $content; ?>
                 </div>
@@ -196,7 +197,7 @@
             <div class="s12">
                 <footer>
                     <hr/>
-                    <p>Copyright &copy; <?php echo date('Y'); ?>. Da Numba 1 Movie Catalog App.</p>
+                    <p>Copyright &copy; <?php echo date('Y'); ?>. Movie Catalog Web-app.</p>
                 </footer>
             </div>
             

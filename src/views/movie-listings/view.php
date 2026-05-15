@@ -36,10 +36,11 @@
 </ul>
 <p>
     <a href="<?= $controller_object->makeLink( "movie-listings/index" ); ?>">View all Movies</a>
+    
     <?php if( $controller_object->isLoggedIn() ): ?>
 
-        | <a href="<?= $controller_object->makeLink( "movie-listings/edit/" . $movie_record->id ); ?>">Edit</a> |
-        <a href="<?= $controller_object->makeLink( "movie-listings/delete/" . $movie_record->id ); ?>">Delete</a>
+        | <a href="<?= $controller_object->makeLink( "movie-listings/edit/" . $movie_record->id ); ?>">Edit</a> 
+        | <a href="<?= $controller_object->makeLink( "movie-listings/delete/" . $movie_record->id ); ?>">Delete</a>
 
     <?php endif;  ?>
 </p>
